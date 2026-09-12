@@ -1,0 +1,23 @@
+{
+  "name": "ais-landing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "AIS — самостоятельная презентация на основе Figma Make, без внешних зависимостей",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:public": "node scripts/build.mjs --audience public",
+    "build:all": "node scripts/build.mjs --all",
+    "dev": "node scripts/build.mjs && node scripts/serve.mjs",
+    "preview": "node scripts/serve.mjs",
+    "preview:public": "node scripts/serve.mjs --audience public --port 4174",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check src/app.js && node --check scripts/build.mjs && node --check scripts/render.mjs && node --check scripts/serve.mjs && node --check scripts/source-files.mjs && node --check scripts/check-clean.mjs && node --check scripts/build-pages.mjs",
+    "verify": "npm run check && npm test && npm run build:all",
+    "check:clean": "node scripts/check-clean.mjs",
+    "build:pages": "node scripts/build-pages.mjs"
+  }
+}
