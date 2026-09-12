@@ -1,0 +1,189 @@
+{
+  "status": "PASS",
+  "browser": "Chromium 144.0.7559.96",
+  "loading": "Exact standalone HTML via page.set_content; no network navigation",
+  "checks": [
+    {
+      "name": "investor: layout 1440px",
+      "status": "PASS",
+      "details": {
+        "horizontalOverflow": false,
+        "pageErrors": [],
+        "externalRequests": []
+      }
+    },
+    {
+      "name": "investor: layout 1024px",
+      "status": "PASS",
+      "details": {
+        "horizontalOverflow": false,
+        "pageErrors": [],
+        "externalRequests": []
+      }
+    },
+    {
+      "name": "investor: layout 768px",
+      "status": "PASS",
+      "details": {
+        "horizontalOverflow": false,
+        "pageErrors": [],
+        "externalRequests": []
+      }
+    },
+    {
+      "name": "investor: layout 390px",
+      "status": "PASS",
+      "details": {
+        "horizontalOverflow": false,
+        "pageErrors": [],
+        "externalRequests": []
+      }
+    },
+    {
+      "name": "investor: layout 360px",
+      "status": "PASS",
+      "details": {
+        "horizontalOverflow": false,
+        "pageErrors": [],
+        "externalRequests": []
+      }
+    },
+    {
+      "name": "investor: layout 320px",
+      "status": "PASS",
+      "details": {
+        "horizontalOverflow": false,
+        "pageErrors": [],
+        "externalRequests": []
+      }
+    },
+    {
+      "name": "public: layout 1440px",
+      "status": "PASS",
+      "details": {
+        "horizontalOverflow": false,
+        "pageErrors": [],
+        "externalRequests": []
+      }
+    },
+    {
+      "name": "public: layout 1024px",
+      "status": "PASS",
+      "details": {
+        "horizontalOverflow": false,
+        "pageErrors": [],
+        "externalRequests": []
+      }
+    },
+    {
+      "name": "public: layout 768px",
+      "status": "PASS",
+      "details": {
+        "horizontalOverflow": false,
+        "pageErrors": [],
+        "externalRequests": []
+      }
+    },
+    {
+      "name": "public: layout 390px",
+      "status": "PASS",
+      "details": {
+        "horizontalOverflow": false,
+        "pageErrors": [],
+        "externalRequests": []
+      }
+    },
+    {
+      "name": "public: layout 360px",
+      "status": "PASS",
+      "details": {
+        "horizontalOverflow": false,
+        "pageErrors": [],
+        "externalRequests": []
+      }
+    },
+    {
+      "name": "public: layout 320px",
+      "status": "PASS",
+      "details": {
+        "horizontalOverflow": false,
+        "pageErrors": [],
+        "externalRequests": []
+      }
+    },
+    {
+      "name": "Base scenario and negative result",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "Expanded scenario changes table and funding requirement",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "Keyboard tabs / roving focus",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "Essential assumptions visible while disclosure collapsed",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "Native financing disclosure",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "Native modal and focus containment",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "PDF download and SHA-256 identity",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "Modal Escape and focus return",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "Mobile menu Escape",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "Mobile anchor targets team; heading not under header",
+      "status": "PASS",
+      "details": {
+        "top": 192.453125,
+        "header": 78
+      }
+    },
+    {
+      "name": "Horizontal scrolling restricted to financial table",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "Print: both scenarios and expanded caveats",
+      "status": "PASS",
+      "details": null
+    },
+    {
+      "name": "No-JavaScript fallback: content, both scenarios and materials",
+      "status": "PASS",
+      "details": null
+    }
+  ],
+  "notTested": [
+    "Published URL / GitHub Pages",
+    "Safari and Firefox",
+    "Remote GitHub writes",
+    "Hosting authentication"
+  ]
+}

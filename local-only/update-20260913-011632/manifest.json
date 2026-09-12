@@ -1,0 +1,67 @@
+[
+  {
+    "path": ".gitignore",
+    "before": "5f0a1a989d46b1dd2481dbf2664a9d8592bab1c1a4ba18511f7f7e6434852b04",
+    "after": "ba66fe412166d37584560a01090662dbcc813640061466ce02fdd1c9ef531e69"
+  },
+  {
+    "path": "README.md",
+    "before": "62ec336785b3d5bb105b2c87d1d58c514c86a0a7b0603aa5eb7ba01c38fa1479",
+    "after": "17531f7505e7ac59885fe0640c4633dcd78f2d1bc6a5fc1d250e7965f706f879"
+  },
+  {
+    "path": "package.json",
+    "before": "29b14f5c51c2e0b2d98b05ee3be8e621e279bf217d5ef8ac89bbc687743ce02c",
+    "after": "446508b1897f8990de172a635429853b674414430d6f194af90021f4ad0ecf3c"
+  },
+  {
+    "path": "scripts/render.mjs",
+    "before": "eaff438afff3be6408adbe0e0bce6f5465b24a783e7dfb51955d28f861110cf3",
+    "after": "51551e949946e4e5c75a085b9144623c7ee96d7bbfdd1ca87a63cefc58387a33"
+  },
+  {
+    "path": "scripts/push-private.sh",
+    "before": "ba1758ce530e3e042848760c6f6983baeff11fc77bc0269a5d90dd02a3e0a172",
+    "after": "cc6aaf4b60b566fd8902166457de0529425b05a8198adfdfa6362a4c1202948b"
+  },
+  {
+    "path": "scripts/build.mjs",
+    "before": "25336ce96f7551c31f940eca1e258eaf10562e76d9411d70e45f72bdf060b311",
+    "after": "2215c2f8eb3d39f7524975d7bdd667b31233296f13b7ca35504c35e06407e291"
+  },
+  {
+    "path": "tests/site.test.mjs",
+    "before": "46b97fb2b073902f8d1bbbb2fa7878c7e38837b5be46af57e9884e94b642e0df",
+    "after": "2a8cb0fb5ace7dc552ed33e9fcfc68f9639a3d1d8110b471f6cbabee24a027ae"
+  },
+  {
+    "path": "tests/browser_check.py",
+    "before": "41b2659e39f815db3e195903a94dfdb25a56dddbeb8a9ae161b455e8de6949e4",
+    "after": "b4d2e490efaba5ac899292f92abcec778fa3b5d1b2139db3cfb1ac91422cf3e9"
+  },
+  {
+    "path": "content/site.json",
+    "before": "3fe9e1cd53aae4664ff9ac396e927e7dfb189eb34cd11841348e9d3515f43881",
+    "after": "e38e440817b427f9eaa00d9cf18f5a7dbcdbd12fc6f7bf3adb819e3ede573b9b"
+  },
+  {
+    "path": "content/investor.json",
+    "before": "1ce4c77717ec7d379bd12509ac883b719d8e9b1752e033a50b7b5702ee2c9cb3",
+    "after": "3a63c63cb0b86bc0ca197316646f0595e167640e922ab9ece76efe23befecf0a"
+  },
+  {
+    "path": ".github/workflows/check.yml",
+    "before": "3dc2a5a29bfabcb07ef39135957a23bf37e7edbd60ddda80539b1dffed9cfe26",
+    "after": "a3aea7e599156afb086ab372e1526b9331df0ce4e5e2963f69b01722aed968ec"
+  },
+  {
+    "path": "scripts/source-files.mjs",
+    "before": null,
+    "after": "59122d131d6d1fb0c270a9e4bc6d57889f89950ccf6648cc07f364776ec0076c"
+  },
+  {
+    "path": "scripts/check-clean.mjs",
+    "before": null,
+    "after": "dd1a18538d011433abb6e1518c52934d9a05c21c91e960c035cef2ebb6a2f80e"
+  }
+]

@@ -1,0 +1,1237 @@
+--- before/.gitignore
++++ after/.gitignore
+@@ -1,10 +1,83 @@
++# Dependencies and generated builds
+ node_modules/
+-dist*/
+-.DS_Store
++/dist/
++/dist-*/
++/build/
++coverage/
++.cache/
++.vite/
++
++# Local source documents and financial attachments
++/private-assets/
++/local-materials/
++/local-only/
++/incoming/
++*.doc
++*.docx
++*.xls
++*.xlsx
++*.pdf
++*.zip
++*.7z
++*.tar
++*.tar.gz
++*.tgz
++
++# Reference exports, internal notes and generated QA evidence
++/reference/
++/docs/
++/qa/
++/qa-output/
++/reports/
++/artifacts/
++/out/
++/tmp/
++/START_HERE*.md
++/CHANGELOG.md
++/AIS_*Preview.html
++/AIS_*.png
++/AIS_*_RU.md
++/SCA_Internal_Review*.md
++playwright-report/
++test-results/
++*.log
++
++# Secrets and local environment
+ .env
+ .env.*
+ !.env.example
+-*.log
+-qa-output/
++.envrc
++*.pem
++*.key
++*.p12
++*.pfx
++.secrets/
++secrets/
++.venv/
++venv/
+ __pycache__/
+-.venv/
++*.py[cod]
++.pytest_cache/
++.ruff_cache/
++
++# macOS, editor and Office temporary files
++.DS_Store
++._*
++.Spotlight-V100/
++.Trashes/
++.idea/
++.vscode/
++*~
++~$*
++*.swp
++*.swo
++*.bak
++*.tmp
++
++# Keep source, required site assets, tests, workflows and lockfiles tracked.
++# This file does not untrack files already committed to Git.
++
++# Retired local upload helper and internal safety notes
++/scripts/push-private.sh
++/SECURITY.md
++/output/
+--- before/README.md
++++ after/README.md
+@@ -1,95 +1,40 @@
+-# AIS — Asset Integrity Systems
++# AIS landing
+ 
+-Самостоятельная версия лендинга на основе переданных исходников Figma Make и пакета первой встречи от **12.09.2026**. Доработка: **13.09.2026**.
++Автономная русская презентация AIS: HTML, CSS, JavaScript и сборщик Node.js 22+. Внешних npm-зависимостей нет. Утверждённая монограмма хранится в `assets/ais-monogram.png`.
+ 
+-## Что здесь изменилось
++## Локальная проверка
+ 
+-Содержание и последовательность презентации сохранены. Служебная React/Vite-сборка Figma заменена статической HTML/CSS/JavaScript-реализацией: для этой страницы нет обязательной серверной логики и не нужны внешние пакеты. Это **не исправленный React-проект**: это самостоятельный перенос его интерфейса и содержимого. Оригинал сохранён в `reference/`.
+-
+-Не нужны Figma, npm registry, Google Fonts, внешние фотографии или CDN для сборки/просмотра. Системные шрифты без поставки файлов шрифтов. Чужие фоновые фотографии из исходного кода заменены типографикой и схемой подхода, чтобы не зависеть от внешнего источника и непроверенных прав на изображения. Логотип не перерисован.
+-
+-## Быстрый запуск
+-
+-Требуется Node.js **22+**. Основные команды не устанавливают зависимости:
+-
+-```bash
++```sh
++npm ci --ignore-scripts --no-audit --no-fund
+ npm run verify
++npm run check:clean
+ npm run preview
+ ```
+ 
+-Открыть `http://127.0.0.1:4173/`. Сервер слушает только локальный адрес. `Ctrl+C` останавливает его. Изменили текст/стили — выполните `npm run build`, обновите браузер. HMR отсутствует.
++Инвесторская версия: `http://127.0.0.1:4173`. Для публичной версии: `npm run preview:public`, адрес `http://127.0.0.1:4174`. Обе сборки создаёт `npm run build:all`. Сервер предназначен только для локального просмотра.
+ 
+-Публичный кандидат отдельно:
++Браузерная проверка: `python tests/browser_check.py` при установленном Playwright и Chromium. Она проверяет адаптивность, сценарии, меню, клавиатуру, диалог материалов и режим печати. Результаты сохраняются в игнорируемой `qa-output/`.
+ 
+-```bash
+-npm run build:public
+-npm run preview:public
++## Содержание
++
++- `content/site.json`: общие услуги, команда и контакты.
++- `content/investor.json`: предварительные проектные направления, инвестиционное предложение и прежние финансовые таблицы для сверки.
++- `scripts/source-files.mjs`: явный минимальный состав исходников. `check:clean` копирует только эти файлы во временную папку и проверяет сборки без бизнес-документов; публичную сборку также проверяет без инвесторского JSON.
++
++**Финансовая часть ожидает согласованную модель.** Сверка четырёх DOCX проведена 13.09.2026. Новое предложение 47 млн ₽ не подтверждает пересчёт прежних результатов. Модель и документы обновляются в отдельной задаче. По просьбе владельца служебные комментарии удалены с лендинга. Прогнозные таблицы не выводятся, пока `review.status` не станет `approved` и список `review.issues` не будет пустым. Новое предложение 47 млн ₽ (20 млн ₽ вклад + 27 млн ₽ заём; оборудование 20 млн ₽) выводится по прямому указанию владельца. Финансовые вопросы остаются в данных и локальном отчёте. Для согласованной редакции нужно обновить данные, статусы, пояснения и соответствующие проверки; наличие нерешённых расхождений блокирует показ финансов.
++
++## Необязательное приложение
++
++По умолчанию `attachment: null`: PDF не нужен для сборки, ссылки на него нет. Содержимое `private-assets/` никогда не подбирается автоматически. После согласования документа можно явно указать в инвесторском JSON:
++
++```json
++{"attachment":{"approved":true,"revision":"DOCX-2026-09-13","fileName":"approved-materials.pdf","sha256":"<SHA-256 согласованного PDF>"}}
+ ```
+ 
+-Адрес: `http://127.0.0.1:4174/`. Оба варианта можно также открыть через `dist-*/index.html`; для проверки загрузки PDF предпочтителен локальный сервер. В поставке есть отдельные однофайловые HTML-превью.
++`revision` должна совпадать с `sourceRevision`. Приложение должно находиться внутри `private-assets/`, иметь заголовок PDF и совпадать с указанным хешем; иначе сборка завершается ошибкой. Объект выше — пример настройки, не утверждение финансовых материалов. Публичная сборка не читает инвесторский JSON и не включает приложение. Однофайловое локальное превью доступно через экспорт `standalone()` в `scripts/build.mjs`.
+ 
+-## Две физически разные сборки
++## Репозиторий и публикация
+ 
+-| Команда / каталог | Содержание | Публикация |
+-|---|---|---|
+-| `npm run build` → `dist-investor/` | Полная презентация, финансовые сценарии, условия участия, исходный PDF | Только в защищённой среде после настройки доступа |
+-| `npm run build:public` → `dist-public/` | Подход, услуги, задачи, команда, контактный раздел | Кандидат для открытого показа, требует согласования владельца |
++В Git предназначены только файлы из явного списка исходников. `.gitignore` исключает документы, архивы, внутренние заметки, старые экспорты, результаты сборки и проверок, секреты. Он не прекращает отслеживание уже добавленных файлов. Старый `push-private.sh` отключён и исключён из поставки. Все локальные исходные материалы сохраняются.
+ 
+-Инвестиционные данные не просто спрятаны стилями: в публичном HTML их нет; PDF, исходники и финансовый JSON туда не копируются. Общий клиентский JS не содержит финансовых констант. Это проверяется тестами. Сами **исходники и весь репозиторий остаются приватными**, поскольку в них хранится полная модель содержимого и PDF.
+-
+-**Ни один каталог сам по себе не имеет аутентификации.** Название `investor`, `noindex` и `robots.txt` не защищают данные. Если загрузить `dist-investor` на обычный публичный хостинг, содержимое станет доступно. См. `SECURITY.md`.
+-
+-## Где редактировать
+-
+-- `content/site.json`: тексты, услуги, команда, имя контактного лица, телефон и почта.
+-- `content/investor.json`: сценарии и плановые вводные из документа. Правки только после согласования новой редакции источника.
+-- `src/styles.css`: палитра, типографика и адаптивные сетки.
+-- `src/app.js`: мобильное меню, якоря, вкладки, диалог, печать.
+-- `scripts/render.mjs`: разметка разделов.
+-- `assets/ais-monogram.png`: утверждённый логотип, байт-в-байт исходный PNG. Это не вектор.
+-- `private-assets/ais-first-meeting-2026-09-12.pdf`: исходный PDF без изменений.
+-
+-Телефон и email намеренно пустые. Личная почта из GitHub не подставлялась как контакт компании. При заполнении корректными данными появятся рабочие `tel:`/`mailto:`-ссылки. При пустых полях нет фиктивной отправки. Регистрация компании не утверждается как состоявшийся факт.
+-
+-## Загрузка на GitHub
+-
+-В текущей среде подготовки GitHub предоставлял только чтение. **Репозиторий не создан, коммит не отправлен, сайт не опубликован.**
+-
+-Самостоятельная загрузка с вашего компьютера:
+-
+-```bash
+-# GitHub CLI должен быть установлен и авторизован:
+-gh auth login --hostname github.com --web --scopes workflow
+-
+-# Из каталога этого проекта:
+-bash scripts/push-private.sh BabyninAleks-Zi/ais-landing
+-```
+-
+-Скрипт проверяет аккаунт, спрашивает `private`, запускает тесты, создаёт приватный репозиторий при отсутствии или проверяет приватность существующего. В пустой репозиторий делает первый коммит `main`; если там только README/служебные файлы — отправляет отдельную ветку и открывает PR. В другой существующий проект не загружается, force-push не использует, Pages не включает. Для создания коммита должны быть настроены ваши Git `user.name`/`user.email`.
+-
+-При ручном создании: имя `ais-landing`, **Private**, лучше без README/лицензии/`.gitignore`. Скрипт также поддерживает репозиторий только с README. Альтернатива — GitHub Desktop или Codex на вашем Mac с авторизованным Git. Пароли/токены в чат и в файлы проекта не нужны.
+-
+-Разрешение `workflow` запрашивается для загрузки файлов `.github/workflows`; оно не включает публикацию автоматически. При уже настроенной авторизации без этого разрешения используйте `gh auth refresh --hostname github.com --scopes workflow`.
+-
+-Скрипт проверен синтаксически, но его сетевой сценарий не выполнялся: в среде сборки нет авторизованного GitHub CLI.
+-
+-## GitHub Pages: только после отдельного решения
+-
+-`check.yml` проверяет проект, но не публикует. `pages-public.yml`:
+-
+-1. Запускается только вручную.
+-2. Требует repository variable `AIS_ALLOW_PUBLIC_DEPLOY=true`.
+-3. Требует подтверждения `confirm_public` при запуске.
+-4. Передаёт только `dist-public`, никогда `dist-investor`.
+-
+-До этого согласуйте публичный вариант и контакты. Затем Settings → Pages → Source: GitHub Actions; установите переменную и запустите workflow. Это **публичный** сайт даже при приватном репозитории, кроме специальных корпоративных режимов доступа. Доступность Pages для private repo зависит от тарифа. Не переводите весь репозиторий в Public ради Pages: там инвесторский PDF и исходные финансовые данные.
+-
+-Если GitHub Actions недоступен, обе готовые сборки не зависят от него. Для защищённой инвесторской версии используется отдельный хостинг с проверкой доступа до выдачи HTML, JS, PDF и других файлов.
+-
+-## Проверки и границы
+-
+-`npm test` — Node test runner, без внешних библиотек. Проверяются неизменность ключевых чисел, финансовые подписи, единая шкала, ссылки, разделение редакций, подлинность файлов, повторяемость сборки и локальный сервер. Отчёт — `docs/QA_RU.md`.
+-
+-Браузерный набор: `tests/browser_check.py`. Для повторения нужен отдельный Python с Playwright и Chromium; это не зависимость самого сайта. Он проверяет автономные HTML-документы через `set_content`, а не опубликованный сайт. Полное тестирование после развёртывания и проверка Safari/Firefox не выполнены.
+-
+-Источники и границы изменений: `docs/SOURCES_RU.md`. Новая верстка не является обновлением/аудитом финансовой модели.
++Git add, commit и push требуют отдельного решения владельца. Автоматическая проверка не меняет Git. Публикация по умолчанию выключена; существующий workflow Pages требует ручного подтверждения и разрешающей переменной. Он публикует только `dist-public`. Приватный репозиторий и `noindex` не обеспечивают контроль доступа к размещённому сайту; инвесторская сборка не имеет встроенной аутентификации.
+--- before/package.json
++++ after/package.json
+@@ -4,7 +4,9 @@
+   "private": true,
+   "type": "module",
+   "description": "AIS — самостоятельная презентация на основе Figma Make, без внешних зависимостей",
+-  "engines": { "node": ">=22" },
++  "engines": {
++    "node": ">=22"
++  },
+   "scripts": {
+     "build": "node scripts/build.mjs",
+     "build:public": "node scripts/build.mjs --audience public",
+@@ -13,7 +15,8 @@
+     "preview": "node scripts/serve.mjs",
+     "preview:public": "node scripts/serve.mjs --audience public --port 4174",
+     "test": "node --test tests/*.test.mjs",
+-    "check": "node --check src/app.js && node --check scripts/build.mjs && node --check scripts/render.mjs && node --check scripts/serve.mjs",
+-    "verify": "npm run check && npm test && npm run build:all"
++    "check": "node --check src/app.js && node --check scripts/build.mjs && node --check scripts/render.mjs && node --check scripts/serve.mjs && node --check scripts/source-files.mjs && node --check scripts/check-clean.mjs",
++    "verify": "npm run check && npm test && npm run build:all",
++    "check:clean": "node scripts/check-clean.mjs"
+   }
+ }
+--- before/scripts/render.mjs
++++ after/scripts/render.mjs
+@@ -12,7 +12,7 @@
+ function logo(src) { return `<img class="brand-image" src="${e(src)}" alt="AIS — Asset Integrity Systems" width="598" height="251">`; }
+ function block(id, body, tone = '') { return `<section id="${id}" class="section ${tone}" aria-labelledby="${id}-title"><div class="container">${body}</div></section>`; }
+ const arrow = '<span aria-hidden="true">↗</span>';
+-const sourceLink = (page) => `documents/ais-first-meeting-2026-09-12.pdf#page=${page}`;
++
+ 
+ export function validateContent(site, investor) {
+   if (site?.brand !== 'AIS' || !Array.isArray(site.services) || site.services.length !== 4) throw new Error('Некорректные общие данные AIS.');
+@@ -27,22 +27,24 @@
+     if (s.revenue.length !== 3 || s.result.length !== 3 || ![...s.revenue,...s.result,s.financingNeed].every(Number.isFinite)) throw new Error('Некорректные данные сценария.');
+     s.revenue.forEach(revenueHeight);
+   }
++  if (!['needs_model_review','approved'].includes(investor.review?.status) || !Array.isArray(investor.review.issues)) throw new Error('Требуется статус финансовой сверки.');
++  if (investor.review.status === 'approved' && investor.review.issues.length) throw new Error('Нельзя выпускать финансовый раздел с нерешёнными расхождениями.');
+   const f = investor.funding;
+   if (f.equity + f.loan !== f.total || f.paut + f.ectane + f.workingCapital !== f.total) throw new Error('Источники или использование средств не сходятся.');
+ }
+ 
+ function renderScenario(key, s, data) {
+   return `<section class="scenario-panel" id="scenario-${key}" role="tabpanel" aria-labelledby="tab-${key}" tabindex="0" ${key === 'expanded' ? 'hidden' : ''}>
+-    <div class="scenario-header"><p>${e(s.tag)}</p><span class="pill">Прогноз · ${e(data.sourceRevision)}</span></div>
++    <div class="scenario-header"><p>${e(s.tag)}</p><span class="pill">Плановый расчёт</span></div>
+     <div class="financial-layout">
+       <div class="table-area"><p class="small muted">Все суммы — млн ₽. Выручка без НДС.</p>
+         <div class="table-scroll" tabindex="0" role="region" aria-label="Финансовые показатели — ${e(s.label)}">
+-        <table class="financial-table"><caption class="sr-only">${e(s.label)}: прогноз за 2026–2028 годы</caption><thead><tr><th scope="col">Показатель</th>${data.years.map(y=>`<th scope="col">${y}</th>`).join('')}</tr></thead>
+-          <tbody><tr><th scope="row">Выручка<br>без НДС</th>${s.revenue.map(v=>`<td>${formatNumber(v)}</td>`).join('')}</tr>
+-          <tr><th scope="row">Результат<br>после УСН</th>${s.result.map(v=>`<td class="${v < 0 ? 'negative' : 'result'}">${formatNumber(v)}</td>`).join('')}</tr></tbody></table></div>
++        <table class="financial-table"><caption class="sr-only">${e(s.label)}: плановые показатели за 2026–2028 годы</caption><thead><tr><th scope="col">Показатель</th>${data.years.map(y=>`<th scope="col">${y}</th>`).join('')}</tr></thead>
++          <tbody><tr><th scope="row">Выручка<br> без НДС</th>${s.revenue.map(v=>`<td>${formatNumber(v)}</td>`).join('')}</tr>
++          <tr><th scope="row">Результат<br> после УСН</th>${s.result.map(v=>`<td class="${v < 0 ? 'negative' : 'result'}">${formatNumber(v)}</td>`).join('')}</tr></tbody></table></div>
+         <p class="table-hint small muted">На узком экране таблицу можно прокрутить по горизонтали.</p>
+         <div class="liquidity-summary"><span>Потребность с резервом по модели</span><strong>${formatNumber(s.financingNeed)} <small>млн ₽</small></strong></div>
+-        ${key === 'expanded' ? note('Запрос 42 млн ₽ не увеличен автоматически. Для этого сценария с резервом по модели требуется ещё 5,50 млн ₽.', 'warning') : note('42 млн ₽ покрывают расчёт основного варианта с резервом по модели. Возмещаемые перевозки и проживание ещё требуют оценки.')}
++
+       </div>
+       <figure class="revenue-chart"><figcaption>Выручка без НДС <span>млн ₽ · единая шкала</span></figcaption>
+         <div class="chart-plot"><div class="chart-axis" aria-hidden="true"><span>140</span><span>70</span><span>0</span></div>
+@@ -53,57 +55,60 @@
+   </section>`;
+ }
+ 
+-function renderEconomics(data, pdf) {
+-  return block('economics', `${label('Экономика проекта','09')}<div class="section-heading"><h2 id="economics-title">Экономика определённой загрузки,<br>а не оценка всего рынка</h2><p>Показатели исходной модели, без пересчёта доходности или обещаний возврата вложений.</p></div>
++function renderEconomics(data) {
++  return block('economics', `${label('Экономика проекта','09')}<div class="section-heading"><h2 id="economics-title">Экономика запуска</h2><p>Плановые показатели при определённой загрузке и составе работ.</p></div>
++
+     <div class="scenario-tabs" role="tablist" aria-label="Финансовый сценарий">${Object.entries(data.scenarios).map(([key,s])=>`<button type="button" id="tab-${key}" role="tab" aria-controls="scenario-${key}" aria-selected="${key==='base'}" tabindex="${key==='base'?0:-1}" data-scenario="${key}">${e(s.label)}</button>`).join('')}</div>
+     ${Object.entries(data.scenarios).map(([key,s])=>renderScenario(key,s,data)).join('')}
+     <div class="assumptions" aria-label="Основные предпосылки прогноза"><div><strong>365 дней</strong><p>PAUT: все дни приняты оплачиваемыми, включая ожидание.</p></div><div><strong>90 дней</strong><p>Внутритрубная диагностика в год, начиная с 2027 года.</p></div><div><strong>После УСН</strong><p>С учётом амортизации, до процентов по займу и распределения прибыли.</p></div></div>
+-    <details class="disclosure"><summary>Дополнительные условия и границы расчёта</summary><div class="details-body"><p>2026 год включает подготовку запуска и два месяца проектных работ. Продление PAUT и инженерных работ на октябрь–декабрь 2028 года является прогнозом.</p><p>Расчётный результат — не банковский остаток, не дивиденды и не гарантированный доход инвестора. Показатели зависят от загрузки, ставок и окончательного состава затрат.</p><p>Воспроизведена редакция модели от ${e(data.sourceRevision)}. До сделки требуется актуализация договорных, кадровых и закупочных вводных. Финансовые вводные подлежат проверке до принятия инвестиционного решения.</p><a class="text-link" href="${e(pdf || sourceLink(11))}" ${pdf ? 'download="AIS_First_Meeting_2026-09-12.pdf"' : 'target="_blank" rel="noopener"'}>Исходный пакет · финансовые таблицы, стр. 11–13 ${arrow}</a></div></details>`);
++    <details class="disclosure"><summary>Дополнительные условия и границы расчёта</summary><div class="details-body"><p>2026 год включает подготовку запуска и два месяца проектных работ. Продление PAUT и инженерных работ на октябрь–декабрь 2028 года является прогнозом.</p><p>Расчётный результат — не банковский остаток, не дивиденды и не гарантированный доход инвестора. Показатели зависят от загрузки, ставок и окончательного состава затрат.</p><p>Повторная закупка СИЗ в последнем квартале 2028 года и временное финансирование возмещаемых перевозок требуют отдельной оценки.</p></div></details>`);
+ }
+ function renderFinancing(data) {
+   const f=data.funding;
+   const row=(text,amount)=>`<div class="money-row"><span>${e(text)}</span><strong>${amount} <small>млн ₽</small></strong></div>`;
+-  return block('financing', `${label('Финансирование','10')}<div class="section-heading"><h2 id="financing-title">42 млн ₽ на оборудование<br>и стартовый денежный цикл</h2><p>Источники и использование средств — два разных разреза одного бюджета.</p></div>
++  return block('financing', `${label('Финансирование',data.review.status==='approved'?'10':'09')}<div class="section-heading"><h2 id="financing-title">${f.total} млн ₽ на оборудование<br> и стартовый денежный цикл</h2><p>Источники и использование средств — два разреза одного бюджета.</p></div>
++
+     <div class="funding-grid"><article class="funding-card"><h3>Источники финансирования</h3>${row('Долевой вклад инвестора',f.equity)}${row('Заём инвестора',f.loan)}<div class="money-total">Итого <strong>${f.total} млн ₽</strong></div></article>
+-    <article class="funding-card accent"><h3>Использование средств</h3>${row('Два комплекта SIUI SyncScan 3',f.paut)}${row('Комплект Ectane 3',f.ectane)}${row('Запуск, зарплата, налоги, оборот и резерв',f.workingCapital)}${note('План закупки. Комплектность и окончательные цены уточняются с поставщиками.')}</article></div>
+-    <div class="cash-cycle"><h3>Работа выполняется раньше оплаты</h3><ol>${['Выполнение работ','Приёмка и счёт','Отсрочка оплаты','Поступление денег'].map(x=>`<li>${e(x)}</li>`).join('')}</ol><p>Базовая отсрочка модели — <strong>${f.paymentDelayDays} дней от счёта</strong>. Затраты на исполнение возникают до оплаты заказчиком.</p></div>
+-    ${note('Состав резерва определяется моделью. Это не гарантия трёх месяцев покрытия любых расходов. Временное финансирование возмещаемых перевозок и проживания ещё требует оценки.', 'warning')}
+-    <details class="disclosure"><summary>Предлагаемые условия участия</summary><div class="details-body"><div class="equity-grid"><div><strong>${f.investorShare}%</strong><p>Предлагаемая доля инвестора</p></div><div><strong>20 / 20 / 20%</strong><p>Базовые доли трёх учредителей</p></div><div><strong>${f.loan} млн ₽</strong><p>Отдельный заём, не вклад за долю</p></div></div><p>Ставка, сроки и график возврата займа согласуются отдельно. В текущем прогнозе возврат и проценты не начислены. Распределение прибыли не заменяет исполнение обязательств компании.</p></div></details>`, 'tone-light');
++    <article class="funding-card accent"><h3>Использование средств</h3>${row('Два комплекта SIUI SyncScan 3 — около',f.paut)}${row('Комплект Ectane 3',f.ectane)}${row('Запуск, зарплата, налоги, оборот и резерв',f.workingCapital)}${note('Плановый бюджет закупки. Комплектность и окончательные цены уточняются с поставщиками.')}</article></div>
++    <div class="cash-cycle"><h3>Работа выполняется раньше оплаты</h3><ol>${['Выполнение работ','Приёмка и счёт','Отсрочка оплаты','Поступление денег'].map(x=>`<li>${e(x)}</li>`).join('')}</ol><p>Плановая отсрочка оплаты — <strong>${f.paymentDelayDays} дней от счёта</strong>. Затраты на исполнение возникают до оплаты заказчиком.</p></div>
++    ${note('Запуск, зарплата, налоги, оборотный капитал и резерв — 27 млн ₽. Перевозки и проживание оплачиваются по условиям конкретного проекта.', 'warning')}
++    <details class="disclosure"><summary>Предлагаемые условия участия</summary><div class="details-body"><div class="equity-grid"><div><strong>${f.investorShare}%</strong><p>Предлагаемая доля инвестора</p></div><div><strong>20 / 20 / 20%</strong><p>Базовые доли трёх учредителей</p></div><div><strong>${f.loan} млн ₽</strong><p>Отдельный заём, не вклад за долю</p></div></div><p>Ставка, сроки и график возврата займа согласуются отдельно. Порядок распределения прибыли определяется с учётом обязательств компании.</p></div></details>`, 'tone-light');
+ }
+ 
+ export function renderPage(site, investor, options = {}) {
+   validateContent(site, investor);
+   const privateEdition=Boolean(investor);
++  const showFinancials=privateEdition && investor.review.status === 'approved';
+   const image=options.logoData || 'assets/ais-monogram.png';
+-  const nav=privateEdition ? [['Подход','approach'],['Услуги','services'],['Команда','team'],['Проекты','projects'],['Экономика','economics'],['План запуска','launch']] : [['Подход','approach'],['Услуги','services'],['Задачи','tasks'],['Команда','team']];
++  const nav=privateEdition ? [['Подход','approach'],['Услуги','services'],['Команда','team'],['Проекты','projects'],...(showFinancials ? [['Экономика','economics']] : []),['Финансирование','financing'],['План запуска','launch']] : [['Подход','approach'],['Услуги','services'],['Задачи','tasks'],['Команда','team']];
+   const navHtml=nav.map(([name,id])=>`<a href="#${id}" data-nav="${id}">${name}</a>`).join('');
+   const contact=site.contact;
+-  const contactHasChannel=Boolean(contact.email||contact.phone);
+-  const pdfHref=options.pdfData||'documents/ais-first-meeting-2026-09-12.pdf';
++  const attachment=privateEdition ? options.attachment : null;
++  const pdfHref=attachment?.href;
++  const materialsLink=attachment ? `<a class="button" href="${e(pdfHref)}" download="${e(attachment.fileName)}">Сохранить согласованное приложение <span aria-hidden="true">↓</span></a>` : '';
+   const labelMode=privateEdition?'Инженерная компания · Инвестиционный проект':'Проект инженерной компании';
+-  const sourceRef=privateEdition?`<a class="source-link" href="${e(pdfHref)}" ${options.pdfData?'download="AIS_First_Meeting_2026-09-12.pdf"':'target="_blank" rel="noopener"'}>Материалы от ${e(site.sourceRevision)}</a>`:'';
+   const body=`
+ <a class="skip-link" href="#main">Перейти к содержанию</a>
+ <header class="site-header"><div class="container header-inner"><a class="brand" href="#top" aria-label="AIS — к началу страницы">${logo(image)}</a><nav class="desktop-nav" aria-label="Основная навигация">${navHtml}</nav><a class="button button-small header-cta" href="#contact">Обсудить проект</a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-navigation" aria-label="Открыть меню"><span aria-hidden="true">☰</span><span>Меню</span></button></div><nav class="mobile-nav" id="mobile-navigation" aria-label="Мобильная навигация">${navHtml}<a href="#contact">Обсудить проект</a></nav><div class="reading-progress" aria-hidden="true"></div></header>
+ <main id="main" tabindex="-1">
+-<section id="top" class="hero" aria-labelledby="hero-title"><div class="container"><div class="hero-grid"><div class="hero-copy">${label(labelMode)}<h1 id="hero-title">${e(site.hero.title)}<br><span>${e(site.hero.accent)}</span></h1><p class="hero-intro">${e(site.hero.intro)}</p><p class="hero-detail">${e(privateEdition?site.hero.detail:'Связываем инженерную подготовку, полевой контроль и проверку результатов. Развиваем направления под конкретные задачи заказчиков.')}</p><div class="button-row"><a class="button" href="#approach">${privateEdition?'Рассмотреть проект':'Наш подход'} ${arrow}</a><a class="button button-outline" href="#${privateEdition?'economics':'services'}">${privateEdition?'Экономика запуска':'Направления работы'}</a></div></div>
+-<aside class="engineering-plate" aria-label="Последовательность инженерной работы"><div class="plate-heading"><span>AIS / ПОДХОД</span><span class="plate-dot" aria-hidden="true"></span></div><div class="plate-object"><div class="object-rings" aria-hidden="true"><i></i><i></i><i></i><b></b></div><div><span class="small">Отправная точка</span><strong>Оборудование<br>и его состояние</strong></div></div><ol class="plate-steps">${[['01','Понять условия','Материал · среда · история'],['02','Получить данные','Программа · метод · измерения'],['03','Проверить результат','Прослеживаемость · ограничения']].map(([n,t,d])=>`<li><span>${n}</span><div><strong>${t}</strong><small>${d}</small></div></li>`).join('')}</ol><p class="plate-footer">Следующая инспекция опирается<br>на предыдущую.</p></aside></div>
+-${privateEdition?`<div class="hero-facts"><div><strong>2 команды PAUT</strong><span>стартовая программа</span></div><div><strong>90 дней</strong><span>план диагностики теплообменников в год</span></div><div><strong>42 млн ₽</strong><span>предлагаемое финансирование</span></div></div><p class="hero-caption">Параметры планируемого запуска, не текущие достижения компании.</p>`:`<div class="hero-facts compact"><div><strong>Подготовка</strong><span>задача и программа инспекции</span></div><div><strong>Контроль</strong><span>измерения по согласованной технологии</span></div><div><strong>Данные</strong><span>проверяемая история состояния</span></div></div>`}
++<section id="top" class="hero" aria-labelledby="hero-title"><div class="container"><div class="hero-grid"><div class="hero-copy">${label(labelMode)}<h1 id="hero-title">${e(site.hero.title)}<br> <span>${e(site.hero.accent)}</span></h1><p class="hero-intro">${e(site.hero.intro)}</p><p class="hero-detail">${e(privateEdition?site.hero.detail:'Связываем инженерную подготовку, полевой контроль и проверку результатов. Развиваем направления под конкретные задачи заказчиков.')}</p><div class="button-row"><a class="button" href="#approach">${privateEdition?'Рассмотреть проект':'Наш подход'} ${arrow}</a><a class="button button-outline" href="#${privateEdition?'launch':'services'}">${privateEdition?'План запуска':'Направления работы'}</a></div></div>
++<aside class="engineering-plate" aria-label="Последовательность инженерной работы"><div class="plate-heading"><span>AIS / ПОДХОД</span><span class="plate-dot" aria-hidden="true"></span></div><div class="plate-object"><div class="object-rings" aria-hidden="true"><i></i><i></i><i></i><b></b></div><div><span class="small">Отправная точка</span><strong>Оборудование<br> и его состояние</strong></div></div><ol class="plate-steps">${[['01','Понять условия','Материал · среда · история'],['02','Получить данные','Программа · метод · измерения'],['03','Проверить результат','Прослеживаемость · ограничения']].map(([n,t,d])=>`<li><span>${n}</span><div><strong>${t}</strong><small>${d}</small></div></li>`).join('')}</ol><p class="plate-footer">Следующая инспекция опирается<br> на предыдущую.</p></aside></div>
++${privateEdition?`<div class="hero-facts"><div><strong>2 команды PAUT</strong><span>стартовая программа</span></div><div><strong>90 дней</strong><span>план диагностики теплообменников в год</span></div><div><strong>${investor.funding.total} млн ₽</strong><span>предлагаемое финансирование</span></div></div><p class="hero-caption">Стартовая программа проекта.</p>`:`<div class="hero-facts compact"><div><strong>Подготовка</strong><span>задача и программа инспекции</span></div><div><strong>Контроль</strong><span>измерения по согласованной технологии</span></div><div><strong>Данные</strong><span>проверяемая история состояния</span></div></div>`}
+ </div></section>
+-${block('approach',`${label('Задача заказчика','02')}<div class="split"><div><h2 id="approach-title">${e(site.problem.title)}</h2><p class="lead">${e(site.problem.text)}</p><p class="statement">AIS связывает эти задачи в одну последовательность работ.</p></div><ol class="questions">${site.problem.questions.map(([q,d],i)=>`<li><span class="number">0${i+1}</span><div><h3>${e(q)}</h3><p>${e(d)}</p></div></li>`).join('')}</ol></div>`)}
+-${block('cycle',`${label('Инженерный подход','03')}<div class="split unequal"><div><h2 id="cycle-title">Один объект.<br>Связанный цикл инспекций</h2><p class="lead">Эксплуатационные решения остаются за заказчиком. AIS отвечает за качество своей инженерной и диагностической работы.</p>${note('Цикл повторяется. Каждая инспекция опирается на предыдущую.')}</div><ol class="process">${site.process.map(([title,text],i)=>`<li><span class="number">0${i+1}</span><div><h3>${e(title)}</h3><p>${e(text)}</p></div></li>`).join('')}</ol></div>`, 'tone-light')}
+-${block('services',`${label('Что предлагает AIS','04')}<div class="section-heading"><h2 id="services-title">Четыре направления<br>одной инженерной задачи</h2></div><div class="service-grid">${site.services.map((s,i)=>`<article class="service-card"><div class="service-top"><span class="service-number">0${i+1}</span><span class="service-methods">${e(s.methods)}</span></div><h3>${e(s.title)}</h3><p>${e(s.body)}</p><div class="service-result"><strong>Результат для заказчика</strong><p>${e(s.result)}</p></div></article>`).join('')}</div>${note('Самостоятельная экспертиза промышленной безопасности не входит в стартовую деятельность.')}`)}
+-${block('tasks',`${label('Прикладные инженерные задачи','05')}<div class="section-heading"><h2 id="tasks-title">Где нужен не только прибор,<br>но и инженерная подготовка</h2><p>Примеры задач и планируемых подходов — не выполненные кейсы AIS.</p></div><div class="task-grid">${site.tasks.map((x,i)=>`<article class="task-card"><span class="task-mark" aria-hidden="true">0${i+1}</span><h3>${e(x.title)}</h3><p>${e(x.body)}</p>${x.note?note(x.note,'warning'):''}</article>`).join('')}</div>`, 'tone-dark')}
+-${privateEdition ? block('program',`${label('Стартовая программа','06')}<div class="section-heading"><h2 id="program-title">Начинаем с определённого<br>состава работ</h2><p>Для чередования двух смен PAUT предусмотрено десять специалистов; одновременно на объекте — пять.</p></div><div class="program-grid">${investor.program.map((x,i)=>`<article class="program-card"><span class="pill">${i===2?'Кампания':'Постоянная позиция — план'}</span><h3>${e(x.title)}</h3><ul>${x.lines.map(t=>`<li>${e(t)}</li>`).join('')}</ul></article>`).join('')}</div><div class="expansion-callout"><strong>Шесть инженеров — отдельный сценарий</strong><p>При обеспеченном заказе и оборотном капитале, без автоматического включения в основной вариант.</p></div>${note('Непрерывная оплата PAUT — предпосылка финансовой модели, не подписанное обязательство заказчика.')}`, 'tone-light'):''}
+-${block('team',`${label('Команда и качество','07')}<div class="split"><div><h2 id="team-title">Персональная ответственность<br>за исполнение и данные</h2><p class="lead">Компания объединяет личный профессиональный опыт участников команды на крупных нефтегазовых объектах. Он является основой подхода, но не заменяет историю контрактов новой компании.</p><div class="team-list">${site.team.map(x=>`<article class="team-member"><span class="initials" aria-hidden="true">${e(x.initials)}</span><div><h3>${e(x.name)}</h3><p class="member-role">${e(x.role)}</p><p>${e(x.detail)}</p></div></article>`).join('')}</div></div><div class="quality-card"><h3>Контрольные точки</h3><ol>${site.quality.map((x,i)=>`<li><span>0${i+1}</span><p>${e(x)}</p></li>`).join('')}</ol><div class="quality-bottom"><span class="small">До передачи заказчику</span><strong>Проверяем не только отчёт,<br>но и основание вывода.</strong></div></div></div>`)}
+-${privateEdition?block('projects',`${label('Выход на проекты','08')}<div class="split"><div><h2 id="projects-title">Первый шаг — специализированная работа через действующих подрядчиков</h2><p class="lead">Планируем начинать с задач, для которых генеральным подрядчикам нужны профильные команды, техническая подготовка и проверяемый результат. Расширение связываем с фактическими заказами и условиями оплаты.</p><p>Основной коммерческий аргумент — подготовленные специалисты, качество данных, технологическая готовность и контроль исполнения.</p></div><div><ol class="project-list">${investor.projects.map(([name,detail],i)=>`<li><span class="number">0${i+1}</span><div><h3>${e(name)}</h3><p>${e(detail)}</p></div></li>`).join('')}</ol>${note('По сведениям учредителей проведены предварительные переговоры. Перечисленные проекты не являются подтверждённым портфелем заказов AIS.','warning')}</div></div>`,'tone-light'):''}
+-${privateEdition?renderEconomics(investor,options.pdfData):''}
++${block('approach',`${label('Задача заказчика','02')}<div class="split"><div><h2 id="approach-title">${e(site.problem.title)}</h2><p class="lead">${e(site.problem.text)}</p><p class="statement">Риск-ориентированное планирование учитывает обязательные проверки и не отменяет установленный объём контроля.</p></div><ol class="questions">${site.problem.questions.map(([q,d],i)=>`<li><span class="number">0${i+1}</span><div><h3>${e(q)}</h3><p>${e(d)}</p></div></li>`).join('')}</ol></div>`)}
++${block('cycle',`${label('Инженерный подход','03')}<div class="split unequal"><div><h2 id="cycle-title">Один объект.<br> Связанный цикл инспекций</h2><p class="lead">Эксплуатационные решения остаются за заказчиком. AIS отвечает за качество своей инженерной и диагностической работы.</p>${note('Цикл повторяется. Каждая инспекция опирается на предыдущую.')}</div><ol class="process">${site.process.map(([title,text],i)=>`<li><span class="number">0${i+1}</span><div><h3>${e(title)}</h3><p>${e(text)}</p></div></li>`).join('')}</ol></div>`, 'tone-light')}
++${block('services',`${label('Что предлагает AIS','04')}<div class="section-heading"><h2 id="services-title">Четыре направления<br> одной инженерной задачи</h2></div><div class="service-grid">${site.services.map((s,i)=>`<article class="service-card"><div class="service-top"><span class="service-number">0${i+1}</span><span class="service-methods">${e(s.methods)}</span></div><h3>${e(s.title)}</h3><p>${e(s.body)}</p><div class="service-result"><strong>Результат для заказчика</strong><p>${e(s.result)}</p></div></article>`).join('')}</div>${note(site.epbSupport)}${note(site.additionalWork)}`)}
++${block('tasks',`${label('Прикладные инженерные задачи','05')}<div class="section-heading"><h2 id="tasks-title">Где нужен не только прибор,<br> но и инженерная подготовка</h2><p>Применяем инженерный подход к задачам контроля трубопроводов и теплообменников.</p></div><div class="task-grid">${site.tasks.map((x,i)=>`<article class="task-card"><span class="task-mark" aria-hidden="true">0${i+1}</span><h3>${e(x.title)}</h3><p>${e(x.body)}</p>${x.note?note(x.note,'warning'):''}</article>`).join('')}</div>`, 'tone-dark')}
++${privateEdition ? block('program',`${label('Стартовая программа','06')}<div class="section-heading"><h2 id="program-title">Начинаем с определённого<br> состава работ</h2><p>Для чередования двух смен PAUT предусмотрено десять специалистов; одновременно на объекте — пять.</p></div><div class="program-grid">${investor.program.map((x,i)=>`<article class="program-card"><span class="pill">${i===2?'Кампания':'Постоянная позиция — план'}</span><h3>${e(x.title)}</h3><ul>${x.lines.map(t=>`<li>${e(t)}</li>`).join('')}</ul></article>`).join('')}</div><div class="expansion-callout"><strong>Шесть инженеров — отдельный сценарий</strong><p>При обеспеченном заказе и оборотном капитале. Задачи включают стратегии ТО, процедуры контроля верхнего уровня и формирование объёмов работ. В основной вариант автоматически не включены.</p></div>${note('Стартовая программа предусматривает постоянную загрузку команд PAUT. Объём, оплату ожидания и порядок приёмки закрепляем в договоре.')}`, 'tone-light'):''}
++${block('team',`${label('Команда и качество',privateEdition?'07':'06')}<div class="split"><div><h2 id="team-title">Персональная ответственность<br> за исполнение и данные</h2><p class="lead">Компания объединяет профессиональный опыт участников команды в диагностике, инспекционных программах и организации работ на крупных нефтегазовых объектах.</p><div class="team-list">${site.team.map(x=>`<article class="team-member"><span class="initials" aria-hidden="true">${e(x.initials)}</span><div><h3>${e(x.name)}</h3><p class="member-role">${e(x.role)}</p><p>${e(x.detail)}</p></div></article>`).join('')}</div></div><div class="quality-card"><h3>Контрольные точки</h3><ol>${site.quality.map((x,i)=>`<li><span>0${i+1}</span><p>${e(x)}</p></li>`).join('')}</ol><div class="quality-bottom"><span class="small">До передачи заказчику</span><strong>Проверяем не только отчёт,<br> но и основание вывода.</strong></div></div></div>`)}
++${privateEdition?block('projects',`${label('Выход на проекты','08')}<div class="split"><div><h2 id="projects-title">Первый шаг — специализированная работа через действующих подрядчиков</h2><p class="lead">Планируем начинать с задач, для которых генеральным подрядчикам нужны профильные команды, техническая подготовка и проверяемый результат. Расширение связываем с фактическими заказами и условиями оплаты.</p><p>Основной коммерческий аргумент — подготовленные специалисты, качество данных, технологическая готовность и контроль исполнения.</p></div><div><ol class="project-list">${investor.projects.map(([name,detail],i)=>`<li><span class="number">0${i+1}</span><div><h3>${e(name)}</h3><p>${e(detail)}</p></div></li>`).join('')}</ol>${note('Проектные возможности находятся на стадии предварительных переговоров. Состав работ и условия участия согласуются с заказчиками и подрядчиками.','warning')}</div></div>`,'tone-light'):''}
++${showFinancials?renderEconomics(investor):''}
+ ${privateEdition?renderFinancing(investor):''}
+-${privateEdition?block('launch',`${label('План запуска и условия роста','11')}<div class="section-heading"><h2 id="launch-title">Расширяемся под заказы,<br>а не ради размера компании</h2><p>Все даты — план из материалов первой встречи, а не подтверждение выполненных этапов.</p></div><div class="split unequal"><aside class="growth-conditions"><h3>Проверяем до расширения</h3><ul>${['Объём и условия заказа','Полную стоимость исполнения','Сроки поступления денег','Готовность специалистов и оборудования'].map(x=>`<li>${x}</li>`).join('')}</ul></aside><ol class="timeline">${investor.milestones.map(([date,title,text])=>`<li><div class="timeline-date">${e(date)}</div><div><h3>${e(title)}</h3><p>${e(text)}</p></div></li>`).join('')}</ol></div>${note('Акустическая эмиссия, ACFM, MFL и дистанционные обследования — направления развития, а не уже укомплектованные стартовые услуги.')}`):''}
+-${block('contact',`${label(privateEdition?'Предмет встречи':'Обсуждение задачи',privateEdition?'12':'08')}<div class="split"><div><h2 id="contact-title">${privateEdition?'Обсудим запуск AIS<br>и условия участия':'Обсудим инженерную задачу'}</h2><p class="lead">${privateEdition?'Предлагаем согласовать стартовую программу, структуру финансирования и условия, при которых проект переходит от подготовки к выполнению работ.':'Начинаем с исходных сведений об оборудовании, задачи обследования и ожидаемого результата. Состав и условия работ определяются отдельно.'}</p><ol class="meeting-points">${(privateEdition?['Объём первой программы и подрядный канал','Оборудование и оборотное финансирование','Условия участия и контроль использования средств']:['Объект и задача обследования','Исходные данные, доступы и ограничения','Состав результата и порядок выполнения']).map(x=>`<li>${x}</li>`).join('')}</ol><div class="button-row">${contact.email?`<a class="button" href="mailto:${e(contact.email)}">Написать по проекту ${arrow}</a>`:''}${privateEdition?`<button class="button ${contact.email?'button-outline':''}" type="button" data-open-materials>Материалы первой встречи ${arrow}</button>`:''}<button class="button button-outline print-button" type="button" data-print>Версия для печати</button></div></div><aside class="contact-card"><h3>Контакт по проекту</h3><p class="contact-name">${e(contact.name)}</p><p>${e(contact.role)}</p>${contact.phone?`<a class="contact-link" href="tel:${e(contact.phone.replace(/[^+\d]/g,''))}">${e(contact.phone)}</a>`:''}${contact.email?`<a class="contact-link" href="mailto:${e(contact.email)}">${e(contact.email)}</a>`:''}${!contactHasChannel?'<p class="contact-note">Телефон и почта для внешней публикации пока не указаны. Для связи используйте контакт представителя, передавшего презентацию.</p>':''}<div class="contact-status"><span class="status-dot" aria-hidden="true"></span>Проект создания инженерной компании</div></aside></div>`,'tone-dark')}
++${privateEdition?block('launch',`${label('План запуска и условия роста',showFinancials?'11':'10')}<div class="section-heading"><h2 id="launch-title">Расширяемся под заказы,<br> а не ради размера компании</h2><p>Плановые этапы запуска. Начало работ зависит от готовности договоров, специалистов и оборудования.</p></div><div class="split unequal"><aside class="growth-conditions"><h3>Проверяем до расширения</h3><ul>${['Объём и условия заказа','Полную стоимость исполнения','Сроки поступления денег','Готовность специалистов и оборудования'].map(x=>`<li>${x}</li>`).join('')}</ul></aside><ol class="timeline">${investor.milestones.map(([date,title,text])=>`<li><div class="timeline-date">${e(date)}</div><div><h3>${e(title)}</h3><p>${e(text)}</p></div></li>`).join('')}</ol></div>${note('Направления дальнейшего развития: акустическая эмиссия, ACFM, MFL и дистанционные обследования. Оснащение и подготовку специалистов планируем под конкретные заказы.')}`):''}
++${block('contact',`${label(privateEdition?'Предмет встречи':'Обсуждение задачи',privateEdition?(showFinancials?'12':'11'):'07')}<div class="split"><div><h2 id="contact-title">${privateEdition?'Обсудим запуск AIS<br> и условия участия':'Обсудим инженерную задачу'}</h2><p class="lead">${privateEdition?'Предлагаем согласовать стартовую программу, структуру финансирования и условия, при которых проект переходит от подготовки к выполнению работ.':'Начинаем с исходных сведений об оборудовании, задачи обследования и ожидаемого результата. Состав и условия работ определяются отдельно.'}</p><ol class="meeting-points">${(privateEdition?['Объём первой программы и подрядный канал','Оборудование и оборотное финансирование','Условия участия и контроль использования средств']:['Объект и задача обследования','Исходные данные, доступы и ограничения','Состав результата и порядок выполнения']).map(x=>`<li>${x}</li>`).join('')}</ol><div class="button-row">${contact.email?`<a class="button" href="mailto:${e(contact.email)}">Написать по проекту ${arrow}</a>`:''}${attachment?`<button class="button ${contact.email?'button-outline':''}" type="button" data-open-materials>Материалы проекта ${arrow}</button>`:''}<button class="button button-outline print-button" type="button" data-print>Версия для печати</button></div></div><aside class="contact-card"><h3>Контакт по проекту</h3><p class="contact-name">${e(contact.name)}</p><p>${e(contact.role)}</p>${contact.phone?`<a class="contact-link" href="tel:${e(contact.phone.replace(/[^+\d]/g,''))}">${e(contact.phone)}</a>`:''}${contact.email?`<a class="contact-link" href="mailto:${e(contact.email)}">${e(contact.email)}</a>`:''}<div class="contact-status"><span class="status-dot" aria-hidden="true"></span>Проект создания инженерной компании</div></aside></div>`,'tone-dark')}
+ </main>
+-<footer class="site-footer"><div class="container"><div class="footer-main"><a class="brand" href="#top" aria-label="AIS — к началу страницы">${logo(image)}</a><p>Инженерная подготовка.<br>Специализированный контроль. Проверенные данные.</p><div>${sourceRef}<span class="footer-version">${privateEdition?'Для обсуждения с инвестором':'Информационная версия проекта'}</span></div></div><p class="footer-legal">AIS — Asset Integrity Systems. Проект создания инженерной компании. ${privateEdition?'Материал подготовлен для адресного обсуждения с инвесторами и стратегическими партнёрами. Данные являются плановыми и прогнозными, а не подтверждённым портфелем заказов.':'Представленные направления не означают наличия всех необходимых приборов, разрешений и заключённых договоров.'}</p></div></footer>
+-${privateEdition?`<dialog id="materials-dialog" class="materials-dialog" aria-labelledby="materials-title"><div class="dialog-heading"><h2 id="materials-title">Материалы первой встречи</h2><button type="button" class="dialog-close" data-close-materials aria-label="Закрыть материалы">×</button></div><p>Исходный пакет СЦА · редакция ${e(site.sourceRevision)} · 29 страниц.</p><ul class="materials-list"><li><span>00</span>Описание инвестиционного пакета</li><li><span>01</span>Бизнес-план</li><li><span>Ф</span>Финансовая выжимка</li><li><span>11</span>Техническая идея и модель работы</li></ul><a class="button" href="${e(pdfHref)}" download="AIS_First_Meeting_2026-09-12.pdf">Сохранить исходный PDF <span aria-hidden="true">↓</span></a><p class="small muted">PDF передаётся без редактирования. Финансовая модель Excel в материалы сайта не включена.</p></dialog>`:''}
+-<noscript><style>.scenario-panel[hidden]{display:block!important}.scenario-tabs,.menu-toggle,[data-open-materials],.print-button{display:none!important}</style><div class="noscript-message">JavaScript отключён. ${privateEdition?`Оба сценария показаны последовательно. <a href="${e(pdfHref)}" download="AIS_First_Meeting_2026-09-12.pdf">Исходные материалы PDF</a>.`:'Все основные разделы доступны.'}</div></noscript>`;
++<footer class="site-footer"><div class="container"><div class="footer-main"><a class="brand" href="#top" aria-label="AIS — к началу страницы">${logo(image)}</a><p>Инженерная подготовка.<br> Специализированный контроль. Проверенные данные.</p></div><p class="footer-legal">AIS — Asset Integrity Systems. Инженерная подготовка и диагностика промышленных активов.</p></div></footer>
++${attachment?`<dialog id="materials-dialog" class="materials-dialog" aria-labelledby="materials-title"><div class="dialog-heading"><h2 id="materials-title">Материалы проекта</h2><button type="button" class="dialog-close" data-close-materials aria-label="Закрыть материалы">×</button></div>${materialsLink}</dialog>`:''}
++<noscript><style>.scenario-panel[hidden]{display:block!important}.scenario-tabs,.menu-toggle,[data-open-materials],.print-button{display:none!important}</style>${attachment?`<div class="container">${materialsLink}</div>`:''}</noscript>`;
+   return {body, title: `AIS — Asset Integrity Systems · ${privateEdition?'Инвестиционный проект':'Инженерная компания'}`, description: 'Инженерная подготовка, специализированный неразрушающий контроль и проверенные инспекционные данные.', audience: privateEdition?'investor':'public'};
+ }
+--- before/scripts/push-private.sh
++++ after/scripts/push-private.sh
+@@ -1,72 +1,5 @@
+ #!/usr/bin/env bash
+-# Creates (if missing) a PRIVATE repository and uploads this project.
+-# Requires the owner's local GitHub CLI session. Does not enable Pages.
++# Retained locally for an explanatory error; excluded from the source delivery.
+ set -euo pipefail
+-export GH_HOST=github.com
+-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+-REPO="${1:-BabyninAleks-Zi/ais-landing}"
+-if [[ "$REPO" == "--help" || "$REPO" == "-h" ]]; then
+-  printf '%s\n' 'Usage: bash scripts/push-private.sh OWNER/ais-landing' 'Creates or checks a private repo. Empty repo: main. Nonempty repo: delivery branch + PR. Never enables Pages.'
+-  exit 0
+-fi
+-if [[ ! "$REPO" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then echo 'Некорректный OWNER/REPO.' >&2; exit 1; fi
+-for command in gh git node npm tar; do
+-  if ! command -v "$command" >/dev/null 2>&1; then
+-    echo "Требуется $command. Сначала установите инструмент; инструкция в README.md." >&2; exit 1
+-  fi
+-done
+-if ! gh auth status --hostname github.com >/dev/null 2>&1; then
+-  echo 'Сначала выполните: gh auth login --hostname github.com --web --scopes workflow' >&2; exit 1
+-fi
+-LOGIN="$(gh api user --jq .login)"
+-OWNER="${REPO%%/*}"
+-if [[ "$LOGIN" != "$OWNER" ]]; then
+-  echo "Вы авторизованы как $LOGIN, но целевой владелец — $OWNER. Переключите аккаунт; скрипт остановлен." >&2; exit 1
+-fi
+-if [[ "$(node -p "require('$ROOT/package.json').name")" != 'ais-landing' ]]; then echo 'Неверная папка проекта.' >&2; exit 1; fi
+-printf '\nБудет загружен полный исходный проект и PDF в ПРИВАТНЫЙ репозиторий %s.\n' "$REPO"
+-printf 'Pages не включается. Публичная версия не выпускается.\nДля подтверждения введите private: '
+-read -r CONFIRM
+-if [[ "$CONFIRM" != 'private' ]]; then echo 'Отменено. Репозиторий не изменён.'; exit 1; fi
+-cd "$ROOT"
+-npm run verify
+-if gh repo view "$REPO" --json isPrivate >/dev/null 2>&1; then
+-  PRIVATE="$(gh repo view "$REPO" --json isPrivate --jq .isPrivate)"
+-  if [[ "$PRIVATE" != true ]]; then echo 'Остановлено: репозиторий не приватный. Ничего не загружено.' >&2; exit 1; fi
+-else
+-  echo 'Репозиторий не найден или недоступен. Пробуем создать новый приватный; существующий не изменяем.'
+-  gh repo create "$REPO" --private --description 'AIS — презентация инженерного проекта. Private source and investor materials.'
+-fi
+-[[ "$(gh repo view "$REPO" --json isPrivate --jq .isPrivate)" == true ]] || { echo 'Не подтверждена приватность.' >&2; exit 1; }
+-TEMP="$(mktemp -d "${TMPDIR:-/tmp}/ais-upload.XXXXXXXX")"
+-trap 'rm -rf "$TEMP"' EXIT
+-gh repo clone "$REPO" "$TEMP/repo"
+-cd "$TEMP/repo"
+-BASE=''
+-if git rev-parse --verify HEAD >/dev/null 2>&1; then
+-  BASE="$(git branch --show-current)"
+-  [[ -n "$BASE" ]] || { echo 'Не определена базовая ветка.' >&2; exit 1; }
+-  # Do not import the website into an unrelated existing application repository.
+-  EXISTING="$(git ls-tree -r --name-only HEAD | grep -v -E '^(README(\.md|\.txt)?|\.gitignore|LICENSE(\.md|\.txt)?)$' || true)"
+-  if [[ -n "$EXISTING" ]]; then echo 'Репозиторий уже содержит проект. Автоматическая загрузка остановлена; используйте новый репозиторий.' >&2; exit 1; fi
+-  BRANCH="delivery/ais-landing-$(date +%Y%m%d-%H%M%S)"
+-  git switch -c "$BRANCH"
+-else
+-  BRANCH=main
+-  git switch --orphan main
+-fi
+-if ! git var GIT_AUTHOR_IDENT >/dev/null 2>&1; then
+-  echo 'Настройте Git user.name / user.email на своём компьютере. Скрипт не придумывает автора коммита.' >&2; exit 1
+-fi
+-# Explicit allowlist: no local credentials, output folders or unrelated files.
+-(cd "$ROOT" && tar -cf - .github .gitignore .gitattributes .nvmrc package.json package-lock.json README.md SECURITY.md CHANGELOG.md START_HERE_RU.md src content assets private-assets scripts tests docs reference) | tar -xf -
+-git add -- .github .gitignore .gitattributes .nvmrc package.json package-lock.json README.md SECURITY.md CHANGELOG.md START_HERE_RU.md src content assets private-assets scripts tests docs reference
+-git commit -m 'Deliver standalone AIS landing with verified source data and guarded deployment'
+-# Check privacy again immediately before transmitting investor files.
+-[[ "$(gh repo view "$REPO" --json isPrivate --jq .isPrivate)" == true ]] || { echo 'Приватность изменилась: отправка отменена.' >&2; exit 1; }
+-git push -u origin "$BRANCH"
+-if [[ -n "$BASE" ]]; then
+-  gh pr create --repo "$REPO" --base "$BASE" --head "$BRANCH" --title 'AIS: автономный лендинг и безопасная подготовка публикации' --body 'Сохранены данные пакета 12.09.2026, исправлены логотип, адаптивность, навигация и финансовая графика. Полный проект предназначен для приватного репозитория. Pages не включён. Публичная сборка не содержит инвестиционных данных.'
+-fi
+-printf '\nГотово: https://github.com/%s/tree/%s\n' "$REPO" "$BRANCH"
+-printf 'Репозиторий приватный. Сайт НЕ опубликован.\n'
++printf '%s\n' 'Автоматическая загрузка отключена. Старый скрипт включал внутренние документы.' 'Проверенный перечень исходников: scripts/source-files.mjs.' 'Git add, commit и push выполняются только после отдельного решения владельца.' >&2
++exit 1
+--- before/scripts/build.mjs
++++ after/scripts/build.mjs
+@@ -1,5 +1,5 @@
+-import {readFile,writeFile,mkdir,rm,copyFile} from 'node:fs/promises';
+-import {resolve,join} from 'node:path';
++import {readFile,writeFile,mkdir,rm,copyFile,realpath} from 'node:fs/promises';
++import {resolve,join,sep} from 'node:path';
+ import {fileURLToPath} from 'node:url';
+ import {createHash} from 'node:crypto';
+ import {renderPage,escapeHtml} from './render.mjs';
+@@ -7,6 +7,24 @@
+ export const ROOT=fileURLToPath(new URL('../',import.meta.url));
+ const json=async path=>JSON.parse(await readFile(join(ROOT,path),'utf8'));
+ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
++// Nothing is discovered automatically in private-assets, including old PDFs.
++export async function loadAttachment(investor, root=ROOT) {
++  const attachment=investor?.attachment;
++  if(attachment == null) return null;
++  if(attachment.approved !== true || attachment.revision !== investor.sourceRevision ||
++     !/^[a-zA-Z0-9][a-zA-Z0-9._-]*\.pdf$/.test(attachment.fileName || '') ||
++     !/^[a-f0-9]{64}$/.test(attachment.sha256 || '')) {
++    throw new Error('Приложение требует явного согласования, версии и SHA-256.');
++  }
++  const privateRoot=join(await realpath(root),'private-assets');
++  const file=await realpath(join(privateRoot,attachment.fileName));
++  if(!file.startsWith(privateRoot+sep)) throw new Error('Приложение находится вне private-assets.');
++  const bytes=await readFile(file);
++  if(bytes.subarray(0,5).toString() !== '%PDF-' || sha(bytes) !== attachment.sha256) {
++    throw new Error('Приложение не является PDF или не совпадает с согласованным SHA-256.');
++  }
++  return {...attachment,bytes,href:'documents/'+attachment.fileName};
++}
+ function documentHtml(page, css, js, inline=false, logoData='') {
+   const hash=createHash('sha256').update(js).digest('base64');
+   const csp=inline?`default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'sha256-${hash}'; base-uri 'none'; form-action 'none'; object-src 'none'`:`default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'`;
+@@ -16,13 +34,14 @@
+   if(!['investor','public'].includes(audience)) throw new Error('audience должен быть investor или public.');
+   const site=await json('content/site.json');
+   const investor=audience==='investor'?await json('content/investor.json'):null;
++  const attachment=await loadAttachment(investor);
+   const css=await readFile(join(ROOT,'src/styles.css'),'utf8');
+   const js=await readFile(join(ROOT,'src/app.js'),'utf8');
+   const logo=await readFile(join(ROOT,'assets/ais-monogram.png'));
+   const out=join(ROOT,`dist-${audience}`);
+   await rm(out,{recursive:true,force:true});
+   await mkdir(join(out,'assets'),{recursive:true});
+-  const html=documentHtml(renderPage(site,investor),css,js);
++  const html=documentHtml(renderPage(site,investor,{attachment}),css,js);
+   await writeFile(join(out,'index.html'),html);
+   await copyFile(join(ROOT,'src/styles.css'),join(out,'assets/styles.css'));
+   await copyFile(join(ROOT,'src/app.js'),join(out,'assets/app.js'));
+@@ -30,26 +49,27 @@
+   await writeFile(join(out,'.nojekyll'),'');
+   await writeFile(join(out,'robots.txt'),'User-agent: *\nDisallow: /\n');
+   await writeFile(join(out,'404.html'),'<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>AIS — страница не найдена</title><body><h1>Страница не найдена</h1><p>Проверьте адрес или <a href="./index.html">откройте презентацию AIS</a>.</p></body></html>');
+-  if(investor){
++  if(attachment){
+     await mkdir(join(out,'documents'),{recursive:true});
+-    await copyFile(join(ROOT,'private-assets',investor.sourcePdf),join(out,'documents',investor.sourcePdf));
++    await writeFile(join(out,'documents',attachment.fileName),attachment.bytes);
+   }
+   const files=['index.html','assets/styles.css','assets/app.js','assets/ais-monogram.png','404.html','robots.txt','.nojekyll'];
+-  if(investor) files.push('documents/'+investor.sourcePdf);
++  if(attachment) files.push('documents/'+attachment.fileName);
+   const hashes={};
+   for(const name of files) hashes[name]=sha(await readFile(join(out,name)));
+-  await writeFile(join(out,'build-manifest.json'),JSON.stringify({audience,sourceRevision:site.sourceRevision,implementationRevision:site.implementationRevision,authentication:false,files:hashes},null,2)+'\n');
++  await writeFile(join(out,'build-manifest.json'),JSON.stringify({audience,sourceRevision:site.sourceRevision,implementationRevision:site.implementationRevision,authentication:false,...(investor?{financialStatus:investor.review.status}:{}),files:hashes},null,2)+'\n');
+   return out;
+ }
+ export async function standalone(audience='investor',output) {
+   if(!['investor','public'].includes(audience)) throw new Error('Неизвестная редакция.');
+   const site=await json('content/site.json');
+   const investor=audience==='investor'?await json('content/investor.json'):null;
++  const attachment=await loadAttachment(investor);
+   const css=await readFile(join(ROOT,'src/styles.css'),'utf8');
+   const js=await readFile(join(ROOT,'src/app.js'),'utf8');
+   const logoData='data:image/png;base64,'+(await readFile(join(ROOT,'assets/ais-monogram.png'))).toString('base64');
+-  const pdfData=investor?'data:application/pdf;base64,'+(await readFile(join(ROOT,'private-assets',investor.sourcePdf))).toString('base64'):undefined;
+-  const page=renderPage(site,investor,{logoData,pdfData});
++  const embedded=attachment?{...attachment,href:'data:application/pdf;base64,'+attachment.bytes.toString('base64')}:null;
++  const page=renderPage(site,investor,{logoData,attachment:embedded});
+   await writeFile(output,documentHtml(page,css,js,true,logoData));
+ }
+ if(process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+--- before/tests/site.test.mjs
++++ after/tests/site.test.mjs
+@@ -1,38 +1,40 @@
++import {tmpdir} from 'node:os';
+ import test,{before,after} from 'node:test';
+ import assert from 'node:assert/strict';
+-import {readFile,readdir} from 'node:fs/promises';
++import {readFile,readdir,mkdtemp,mkdir,writeFile,rm,symlink} from 'node:fs/promises';
+ import {join} from 'node:path';
+ import {createHash} from 'node:crypto';
+-import {build,ROOT,standalone} from '../scripts/build.mjs';
++import {build,ROOT,standalone,loadAttachment} from '../scripts/build.mjs';
+ import {escapeHtml,formatNumber,revenueHeight,renderPage,validateContent} from '../scripts/render.mjs';
+ import {safePath,startServer} from '../scripts/serve.mjs';
+ const read=path=>readFile(join(ROOT,path),'utf8');
+ const hash=b=>createHash('sha256').update(b).digest('hex');
+-let site,investor,privateHtml,publicHtml,server,url;
++let site,investor,privateHtml,publicHtml,templateHtml,server,url;
+ before(async()=>{
+  site=JSON.parse(await read('content/site.json'));investor=JSON.parse(await read('content/investor.json'));
+  await build('investor');await build('public');
+  privateHtml=await read('dist-investor/index.html');publicHtml=await read('dist-public/index.html');
++ const fixture=structuredClone(investor);fixture.review={status:'approved',issues:[]};templateHtml=renderPage(site,fixture).body;
+  server=await startServer({root:join(ROOT,'dist-investor'),port:0});url=`http://127.0.0.1:${server.address().port}`;
+ });
+ after(async()=>{if(server)await new Promise(resolve=>server.close(resolve));});
+-test('Финансовые значения основного варианта сохранены',()=>{
++test('Прежние показатели основного варианта сохранены для сверки',()=>{
+  assert.deepEqual(investor.scenarios.base.revenue,[14.01,92.68,92.68]);
+  assert.deepEqual(investor.scenarios.base.result,[-0.03,31.57,30.23]);
+  assert.equal(investor.scenarios.base.financingNeed,37.65);
+ });
+-test('Финансовые значения расширения сохранены',()=>{
++test('Прежние показатели расширения сохранены для сверки',()=>{
+  assert.deepEqual(investor.scenarios.expanded.revenue,[18.88,121.87,121.87]);
+  assert.deepEqual(investor.scenarios.expanded.result,[1.34,40.16,38.22]);
+  assert.equal(investor.scenarios.expanded.financingNeed,47.5);
+ });
+ test('Показан вклад инвестора, а не учредителей',()=>{assert.ok(privateHtml.includes('Долевой вклад инвестора'));assert.ok(!privateHtml.includes('Долевой вклад учредителей'));});
+-test('Источники и назначение средств сходятся',()=>{const f=investor.funding;assert.equal(f.equity+f.loan,42);assert.equal(f.paut+f.ectane+f.workingCapital,42);});
+-test('Отрицательный результат и десятичная запятая сохранены',()=>{assert.equal(formatNumber(-0.03),'−0,03');assert.ok(privateHtml.includes('class="negative">−0,03'));});
+-test('Единая нулевая шкала графика для обоих сценариев',()=>{assert.equal(revenueHeight(140),100);assert.equal(revenueHeight(0),0);assert.equal(revenueHeight(70),50);assert.equal((privateHtml.match(/data-scale="140"/g)||[]).length,6);});
++test('Источники и назначение средств сходятся',()=>{const f=investor.funding;assert.equal(f.equity+f.loan,47);assert.equal(f.paut+f.ectane+f.workingCapital,47);});
++test('Отрицательный результат и десятичная запятая сохранены',()=>{assert.equal(formatNumber(-0.03),'−0,03');assert.ok(templateHtml.includes('class="negative">−0,03'));});
++test('Единая нулевая шкала графика для обоих сценариев',()=>{assert.equal(revenueHeight(140),100);assert.equal(revenueHeight(0),0);assert.equal(revenueHeight(70),50);assert.equal((templateHtml.match(/data-scale="140"/g)||[]).length,6);});
+ test('Отрицательная выручка не рисуется через абсолютное значение',()=>assert.throws(()=>revenueHeight(-1)));
+ test('Недопустимые числа не проходят в диаграмму',()=>{for(const x of [NaN,Infinity,141])assert.throws(()=>revenueHeight(x));});
+-test('Ключевые условия не спрятаны в details',()=>{const alwaysVisible=privateHtml.replace(/<details[\s\S]*?<\/details>/g,'');for(const s of ['365 дней','90 дней','до процентов по займу'])assert.ok(alwaysVisible.includes(s));});
++test('Ключевые условия не спрятаны в details',()=>{const alwaysVisible=templateHtml.replace(/<details[\s\S]*?<\/details>/g,'');for(const s of ['365 дней','90 дней','до процентов по займу'])assert.ok(alwaysVisible.includes(s));});
+ test('Уникальные id страницы',()=>{const ids=[...privateHtml.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);assert.equal(ids.length,new Set(ids).size);});
+ test('Все якоря ведут в существующий раздел',()=>{for(const m of privateHtml.matchAll(/href="#([^"]+)"/g))assert.ok(privateHtml.includes(`id="${m[1]}"`),m[1]);});
+ test('Команда ведёт к участникам, не стартовой программе',()=>assert.match(privateHtml,/<section id="team"[\s\S]*?Бабынин А\.В\./));
+@@ -49,14 +51,65 @@
+ test('Индексирование по умолчанию выключено в обеих редакциях',async()=>{for(const h of [privateHtml,publicHtml])assert.ok(h.includes('content="noindex,nofollow"'));assert.match(await read('dist-public/robots.txt'),/Disallow: \//);});
+ test('Нет зависимости от Figma, CDN или внешних шрифтов',async()=>{const combined=privateHtml+await read('dist-investor/assets/styles.css')+await read('dist-investor/assets/app.js');assert.ok(!/https?:\/\//.test(combined));assert.ok(!combined.includes('.figma/make/site.json'));});
+ test('Утверждённая монограмма используется байт-в-байт',async()=>assert.equal(hash(await readFile(join(ROOT,'assets/ais-monogram.png'))),hash(await readFile(join(ROOT,'dist-investor/assets/ais-monogram.png')))));
+-test('PDF передан байт-в-байт',async()=>assert.equal(hash(await readFile(join(ROOT,'private-assets/ais-first-meeting-2026-09-12.pdf'))),hash(await readFile(join(ROOT,'dist-investor/documents/ais-first-meeting-2026-09-12.pdf')))));
+ test('Ресурсы используют относительные пути для подкаталога Pages',()=>{const links=[...privateHtml.matchAll(/(?:href|src)="([^"]+)"/g)].map(m=>m[1]);assert.ok(!links.some(x=>x.startsWith('/')));});
+ test('CSP отключает соединения и серверную отправку',()=>{assert.ok(privateHtml.includes("connect-src &#39;none&#39;"));assert.ok(privateHtml.includes("form-action &#39;none&#39;"));});
+ test('Локальный сервер выдаёт страницу',async()=>{const r=await fetch(url);assert.equal(r.status,200);assert.match(r.headers.get('content-type'),/text\/html/);});
+-test('Локальный сервер выдаёт PDF без преобразования',async()=>{const r=await fetch(url+'/documents/ais-first-meeting-2026-09-12.pdf');assert.equal(r.status,200);assert.equal(r.headers.get('content-type'),'application/pdf');const b=Buffer.from(await r.arrayBuffer());assert.equal(b.subarray(0,5).toString(),'%PDF-');});
+ test('Локальный сервер не обслуживает исходники',async()=>{assert.equal((await fetch(url+'/content/investor.json')).status,404);});
+ test('Локальный сервер не принимает формы',async()=>assert.equal((await fetch(url,{method:'POST',body:'x'})).status,405));
+ test('Обход корня, скрытые файлы и некорректные пути блокируются',()=>{for(const p of ['/../content/site.json','/%2e%2e/secret','/.git/config','/%00','/%gg','/foo\\bar'])assert.equal(safePath('/site',p),null);});
+ test('Манифест честно указывает отсутствие аутентификации',async()=>assert.equal(JSON.parse(await read('dist-investor/build-manifest.json')).authentication,false));
+ test('Сборка воспроизводима',async()=>{const before=await read('dist-public/build-manifest.json');await build('public');assert.equal(await read('dist-public/build-manifest.json'),before);});
+ test('Невалидный режим сборки не пишет файлы',async()=>await assert.rejects(()=>build('private')));
++
++test('На странице новые суммы без служебных комментариев и старого прогноза',()=>{
++ for(const x of ['47 млн ₽','Долевой вклад инвестора','Заём инвестора','Два комплекта SIUI SyncScan 3'])assert.ok(privateHtml.includes(x),x);
++ for(const html of [privateHtml,publicHtml])for(const x of ['сверк','черновик','DOCX','Excel','пока не указаны','пока не согласовано','исходный пакет','id="economics"','31,57','37,65','47,50','52,50','15 млн ₽','42 млн ₽'])assert.ok(!html.toLowerCase().includes(x.toLowerCase()),x);
++ assert.ok(!privateHtml.includes('data-open-materials>'));
++});
++test('Утверждение финансов без обновления редакции не проходит',()=>{
++ const data=structuredClone(investor);data.review.status='approved';assert.throws(()=>renderPage(site,data));
++});
++test('Новые услуги сохраняют применимость и границы ЭПБ',()=>{
++ for(const html of [privateHtml,publicHtml]) for(const text of ['репрезентативные точки','собственная технологическая процедура','Применимость процедуры','Самостоятельная ЭПБ не входит','ВТД теплообменников','DROPS']) assert.ok(html.includes(text),text);
++});
++test('Частные каналы находятся только в инвесторской версии',async()=>{
++ const publicFiles=await readdir(join(ROOT,'dist-public'),{recursive:true,withFileTypes:true});
++ const allPublic=(await Promise.all(publicFiles.filter(x=>x.isFile()&&!x.name.endsWith('.png')).map(x=>readFile(join(x.parentPath,x.name),'utf8')))).join('\n');
++ for(const text of ['NCOC','Павлодарский','HSE Services','West Control Service','ARISE','ТЕХИНКОМ']){
++  assert.ok(privateHtml.includes(text));assert.ok(!allPublic.includes(text),text);
++ }
++ for(const text of ['needs_model_review','Долевой вклад','Заём инвестора','47 млн','52,50','31,57','40%','application/pdf','JVBER'])assert.ok(!allPublic.includes(text),text);
++});
++test('Без утверждённого приложения нет старого PDF или фиктивной ссылки',async()=>{
++ assert.equal(investor.attachment,null);
++ assert.ok(!/href="[^"]*\.pdf|href="data:application\/pdf|download=/.test(privateHtml));
++ assert.ok(!privateHtml.includes('<dialog'));
++ assert.ok(!privateHtml.includes('Статус материалов'));
++ assert.ok(!(await readdir(join(ROOT,'dist-investor'),{recursive:true})).some(x=>/\.pdf$/.test(x)));
++ assert.equal((await fetch(url+'/documents/ais-first-meeting-2026-09-12.pdf')).status,404);
++});
++test('Обе standalone версии собираются без документов',async()=>{
++ const dir=await mkdtemp(join(tmpdir(),'ais-standalone-test-'));
++ try{for(const kind of ['investor','public']){
++  const file=join(dir,kind+'.html');await standalone(kind,file);
++  const html=await readFile(file,'utf8');assert.ok(!html.includes('data:application/pdf'));assert.ok(!html.includes('ais-first-meeting-2026-09-12.pdf'));
++  assert.ok(html.includes('data:image/png;base64,'));
++ }}finally{await rm(dir,{recursive:true,force:true});}
++});
++test('Приложение требует явного согласования версии, пути и хеша',async()=>{
++ assert.equal(await loadAttachment(investor,'/path/that/does/not/exist'),null);
++ const dir=await mkdtemp(join(tmpdir(),'ais-attachment-test-'));
++ const bytes=Buffer.from('%PDF-1.4\nApproved fixture\n%%EOF');
++ const spec={approved:true,revision:investor.sourceRevision,fileName:'approved.pdf',sha256:hash(bytes)};
++ const data=a=>({...investor,attachment:a});
++ try{
++  await mkdir(join(dir,'private-assets'));await writeFile(join(dir,'private-assets/approved.pdf'),bytes);
++  const actual=await loadAttachment(data(spec),dir);assert.deepEqual(actual.bytes,bytes);
++  assert.ok(renderPage(site,investor,{attachment:actual}).body.includes('download="approved.pdf"'));
++  for(const patch of [{approved:false},{revision:'old'},{sha256:'0'.repeat(64)},{fileName:'../approved.pdf'},{fileName:'/approved.pdf'},{fileName:'missing.pdf'}])await assert.rejects(()=>loadAttachment(data({...spec,...patch}),dir));
++  await writeFile(join(dir,'outside.pdf'),bytes);await symlink(join(dir,'outside.pdf'),join(dir,'private-assets/escape.pdf'));
++  await assert.rejects(()=>loadAttachment(data({...spec,fileName:'escape.pdf'}),dir));
++  await writeFile(join(dir,'private-assets/approved.pdf'),'not a PDF');
++  await assert.rejects(()=>loadAttachment(data({...spec,sha256:hash('not a PDF')}),dir));
++ }finally{await rm(dir,{recursive:true,force:true});}
++});
+--- before/tests/browser_check.py
++++ after/tests/browser_check.py
+@@ -1,138 +1,89 @@
+-"""Browser QA of the exact standalone builds; no network navigation or policy bypass.
+-Requires Python 3.10+, Playwright and Chromium. Does not publish or contact third parties.
++"""Check AIS standalone pages using an optional local Playwright installation.
++No publication, external navigation or changes to source documents.
+ """
+ from pathlib import Path
+-from hashlib import sha256
+-import argparse, json, subprocess, tempfile
++import argparse
++import json
++import subprocess
++import tempfile
+ from playwright.sync_api import sync_playwright, expect
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+ parser = argparse.ArgumentParser()
+-parser.add_argument('--browser', default=None, help='Optional Chromium executable path')
++parser.add_argument('--browser', default=None)
+ parser.add_argument('--out', default=str(ROOT / 'qa-output'))
+ args = parser.parse_args()
+-out = Path(args.out).resolve(); out.mkdir(parents=True, exist_ok=True)
++out = Path(args.out).resolve()
++out.mkdir(parents=True, exist_ok=True)
+ results = []
+-def record(name, details=None):
+-    results.append({'name': name, 'status': 'PASS', 'details': details})
+-def check(condition, message):
+-    if not condition: raise AssertionError(message)
+ 
+-with tempfile.TemporaryDirectory(prefix='ais-browser-') as temp:
+-    temp = Path(temp)
++def check(condition, name):
++    if not condition:
++        raise AssertionError(name)
++    results.append(name)
++
++with tempfile.TemporaryDirectory(prefix='ais-browser-') as directory:
++    temp = Path(directory)
+     script = "import {standalone} from './scripts/build.mjs'; await standalone('investor',process.argv[1]); await standalone('public',process.argv[2]);"
+-    subprocess.run(['node','--input-type=module','-e',script,str(temp/'investor.html'),str(temp/'public.html')],cwd=ROOT,check=True)
+-    htmls={kind:(temp/f'{kind}.html').read_text() for kind in ['investor','public']}
++    subprocess.run(['node', '--input-type=module', '-e', script, str(temp/'investor.html'), str(temp/'public.html')], cwd=ROOT, check=True)
++    htmls = {kind: (temp/f'{kind}.html').read_text() for kind in ['investor', 'public']}
+     with sync_playwright() as p:
+-        launch={'headless':True}
+-        if args.browser: launch['executable_path']=args.browser
+-        browser=p.chromium.launch(**launch)
+-        version=browser.version
+-        for kind in ['investor','public']:
+-            for width,height in [(1440,1000),(1024,900),(768,1024),(390,844),(360,800),(320,720)]:
+-                page=browser.new_page(viewport={'width':width,'height':height},device_scale_factor=1)
+-                errors=[]; outbound=[]
+-                page.on('pageerror',lambda e:errors.append(str(e)))
+-                page.on('request',lambda request:outbound.append(request.url) if request.url.startswith(('http:','https:')) else None)
++        launch = {'headless': True}
++        if args.browser:
++            launch['executable_path'] = args.browser
++        browser = p.chromium.launch(**launch)
++        version = browser.version
++        for kind in htmls:
++            for width, height in [(1440,1000),(768,1024),(390,844),(320,720)]:
++                page = browser.new_page(viewport={'width':width,'height':height})
++                errors, external = [], []
++                page.on('pageerror', lambda error: errors.append(str(error)))
++                page.on('request', lambda request: external.append(request.url) if request.url.startswith(('http:', 'https:')) else None)
+                 page.emulate_media(reduced_motion='reduce')
+-                page.set_content(htmls[kind],wait_until='load')
+-                check(page.locator('html').get_attribute('lang')=='ru','language')
+-                widths=page.evaluate('({viewport:innerWidth,scroll:document.documentElement.scrollWidth})')
+-                check(widths['scroll']<=width+1,f'overflow: {kind} / {width}: {widths}')
+-                check(not errors, f'JavaScript errors: {errors}')
+-                check(not outbound,f'External requests: {outbound}')
+-                check(page.evaluate("getComputedStyle(document.documentElement).scrollBehavior")=='auto','Reduced motion ignored')
+-                check(page.locator('h1').count()==1,'h1 count')
+-                images=page.locator('img').evaluate_all('(items)=>items.every(i=>i.complete && i.naturalWidth>0)')
+-                check(images,'Logo failed to load')
+-                if kind=='investor' and width in [1440,390]:
+-                    page.screenshot(path=str(out/f'hero-{width}.png'))
+-                    page.screenshot(path=str(out/f'page-{width}.png'),full_page=True)
+-                record(f'{kind}: layout {width}px',{'horizontalOverflow':False,'pageErrors':errors,'externalRequests':outbound})
++                page.set_content(htmls[kind], wait_until='load')
++                check(page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'{kind} {width}px: no overflow')
++                check(page.locator('h1').count() == 1, f'{kind} {width}px: heading')
++                check(page.locator('img').evaluate_all('(images)=>images.every(i=>i.complete&&i.naturalWidth>0)'), f'{kind} {width}px: logo')
++                check(not errors and not external, f'{kind} {width}px: no page errors or external requests')
++                check(not any(term in page.inner_text('body').lower() for term in ['сверк','черновик','docx','excel','пока не указаны','пока не согласовано']), f'{kind} {width}px: no internal commentary')
++                if kind == 'investor':
++                    expect(page.locator('#financing-title')).to_contain_text('47 млн ₽')
++                    check(page.locator('#economics').count() == 0, 'Previous forecast is not displayed')
++                    check(page.locator('button[data-open-materials]').count() == 0, 'No materials placeholder')
++                else:
++                    check(page.locator('#financing,#economics,#projects').count() == 0, 'Public edition excludes private sections')
++                page.screenshot(path=str(out/f'{kind}-{width}.png'), full_page=True)
+                 page.close()
+-        page=browser.new_page(viewport={'width':1440,'height':1000})
++        page = browser.new_page(viewport={'width':390,'height':844})
+         page.emulate_media(reduced_motion='reduce')
+-        page.set_content(htmls['investor'],wait_until='load')
+-        expect(page.locator('#scenario-base')).to_be_visible()
+-        expect(page.locator('#scenario-expanded')).to_be_hidden()
+-        expect(page.locator('#scenario-base .negative')).to_have_text('−0,03')
+-        record('Base scenario and negative result')
+-        page.get_by_role('tab',name='С шестью инженерами',exact=True).click()
+-        expect(page.locator('#scenario-expanded')).to_be_visible()
+-        expect(page.locator('#scenario-base')).to_be_hidden()
+-        expect(page.locator('#scenario-expanded .liquidity-summary strong')).to_contain_text('47,50')
+-        record('Expanded scenario changes table and funding requirement')
+-        page.get_by_role('tab',name='С шестью инженерами',exact=True).press('ArrowLeft')
+-        expect(page.locator('#tab-base')).to_be_focused()
+-        expect(page.locator('#scenario-base')).to_be_visible()
+-        record('Keyboard tabs / roving focus')
+-        check(page.locator('.assumptions').is_visible(),'Assumptions not visible')
+-        check(not page.locator('details').first.get_attribute('open'),'details default')
+-        record('Essential assumptions visible while disclosure collapsed')
+-        page.locator('#economics').screenshot(path=str(out/'economics-1440.png'))
+-        page.locator('#services').screenshot(path=str(out/'services-1440.png'))
+-        page.locator('#financing').screenshot(path=str(out/'financing-1440.png'))
+-        summary=page.locator('#financing summary')
+-        summary.click()
+-        check(page.locator('#financing details').evaluate('(e)=>e.open'),'disclosure not opened')
+-        record('Native financing disclosure')
+-        trigger=page.locator('[data-open-materials]')
+-        trigger.click()
+-        dialog=page.locator('#materials-dialog')
+-        expect(dialog).to_be_visible()
+-        expect(page.locator('[data-close-materials]')).to_be_focused()
+-        for _ in range(6):
+-            page.keyboard.press('Tab')
+-            check(page.evaluate("Boolean(document.activeElement.closest('#materials-dialog'))"),'Focus escaped modal')
+-        record('Native modal and focus containment')
+-        with page.expect_download() as info:
+-            page.locator('#materials-dialog a[download]').click()
+-        download=info.value
+-        check(download.suggested_filename=='AIS_First_Meeting_2026-09-12.pdf','PDF filename')
+-        data=Path(download.path()).read_bytes()
+-        expected=(ROOT/'private-assets/ais-first-meeting-2026-09-12.pdf').read_bytes()
+-        check(sha256(data).digest()==sha256(expected).digest(),'Downloaded PDF changed')
+-        record('PDF download and SHA-256 identity')
++        page.set_content(htmls['investor'], wait_until='load')
++        menu = page.locator('.menu-toggle')
++        menu.click()
++        expect(menu).to_have_attribute('aria-expanded', 'true')
+         page.keyboard.press('Escape')
+-        expect(dialog).not_to_be_visible()
+-        expect(trigger).to_be_focused()
+-        record('Modal Escape and focus return')
+-        page.set_viewport_size({'width':390,'height':844})
+-        page.evaluate('window.scrollTo(0,0)')
+-        menu=page.locator('.menu-toggle');menu.click()
+-        expect(menu).to_have_attribute('aria-expanded','true')
+-        page.keyboard.press('Escape')
+-        expect(menu).to_have_attribute('aria-expanded','false')
++        expect(menu).to_have_attribute('aria-expanded', 'false')
+         expect(menu).to_be_focused()
+-        record('Mobile menu Escape')
+         menu.click()
+         page.locator('#mobile-navigation a[href="#team"]').click()
+-        expect(menu).to_have_attribute('aria-expanded','false')
+-        page.wait_for_timeout(100)
+-        metrics=page.evaluate("({top:document.querySelector('#team-title').getBoundingClientRect().top,header:document.querySelector('.header-inner').getBoundingClientRect().bottom})")
+-        check(metrics['top']>=metrics['header']-1,f'Anchor covered: {metrics}')
+-        expect(page.locator('#mobile-navigation a[href="#team"]')).to_have_attribute('aria-current','location')
+-        record('Mobile anchor targets team; heading not under header',metrics)
+-        page.locator('#economics').screenshot(path=str(out/'economics-390.png'))
++        expect(menu).to_have_attribute('aria-expanded', 'false')
++        expect(page.locator('#team-title')).to_be_focused()
++        check(page.evaluate("document.querySelector('#team-title').getBoundingClientRect().top >= document.querySelector('.header-inner').getBoundingClientRect().bottom"), 'Team anchor clears header')
++        page.locator('#financing summary').click()
++        check(page.locator('#financing details').evaluate('(e)=>e.open'), 'Participation disclosure opens')
+         page.locator('#financing').screenshot(path=str(out/'financing-390.png'))
+-        scroller=page.locator('#scenario-base .table-scroll')
+-        check(scroller.evaluate('(e)=>e.scrollWidth>e.clientWidth'),'Expected table-level scroll')
+-        scroller.evaluate('(e)=>e.scrollLeft=e.scrollWidth')
+-        check(scroller.evaluate('(e)=>e.scrollLeft>0'),'Table does not scroll')
+-        record('Horizontal scrolling restricted to financial table')
+         page.emulate_media(media='print')
+         page.evaluate("window.dispatchEvent(new Event('beforeprint'))")
+-        expect(page.locator('#scenario-base')).to_be_visible();expect(page.locator('#scenario-expanded')).to_be_visible()
+-        check(page.locator('details').evaluate_all('(items)=>items.every(d=>d.open)'),'Print omitted details')
+-        record('Print: both scenarios and expanded caveats')
++        check(page.locator('details').evaluate_all('(items)=>items.every(d=>d.open)'), 'Print includes participation conditions')
++        page.pdf(path=str(out/'investor-print.pdf'), prefer_css_page_size=True, print_background=True)
+         page.close()
+-        ctx=browser.new_context(java_script_enabled=False,viewport={'width':390,'height':844})
+-        page=ctx.new_page();page.set_content(htmls['investor'],wait_until='load')
+-        expect(page.locator('#scenario-base')).to_be_visible();expect(page.locator('#scenario-expanded')).to_be_visible()
+-        check(page.locator('a[download]').count()>0,'PDF fallback absent')
+-        check(page.evaluate("getComputedStyle(document.querySelector('.site-header')).position")=='static','NoJS nav overlaps hero')
+-        record('No-JavaScript fallback: content, both scenarios and materials')
+-        ctx.close();browser.close()
+-report={'status':'PASS','browser':'Chromium '+version,'loading':'Exact standalone HTML via page.set_content; no network navigation','checks':results,'notTested':['Published URL / GitHub Pages','Safari and Firefox','Remote GitHub writes','Hosting authentication']}
+-(out/'browser-results.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+-print(json.dumps({'status':'PASS','browser':report['browser'],'checks':len(results),'report':str(out/'browser-results.json')},ensure_ascii=False))
++        context = browser.new_context(java_script_enabled=False, viewport={'width':390,'height':844})
++        page = context.new_page()
++        page.set_content(htmls['investor'], wait_until='load')
++        check(page.locator('#financing').is_visible(), 'NoJS financing visible')
++        check(page.evaluate("getComputedStyle(document.querySelector('.site-header')).position") == 'static', 'NoJS navigation in document flow')
++        check(page.locator('a[download]').count() == 0, 'NoJS has no obsolete attachment')
++        context.close()
++        browser.close()
++report = {'status':'PASS','browser':'Chromium '+version,'checks':results,'notTested':['Published site','Hosting authentication','Safari and Firefox']}
++(out/'browser-results.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n')
++print(json.dumps({'status':'PASS','checks':len(results),'report':str(out/'browser-results.json')},ensure_ascii=False))
+--- before/content/site.json
++++ after/content/site.json
+@@ -1,7 +1,7 @@
+ {
+   "brand": "AIS",
+   "fullName": "Asset Integrity Systems",
+-  "sourceRevision": "12.09.2026",
++  "sourceRevision": "DOCX-2026-09-13",
+   "implementationRevision": "13.09.2026",
+   "contact": {
+     "name": "Бабынин А.В.",
+@@ -16,26 +16,50 @@
+     "detail": "Начинаем с двух команд PAUT и сезонной диагностики трубок теплообменников. Развиваем постоянное инженерное сопровождение под задачи заказчиков."
+   },
+   "problem": {
+-    "title": "Измерения нужны не сами по себе",
+-    "text": "Чертежи, результаты контроля и история ремонтов часто находятся в разных документах. Чтобы спланировать следующую инспекцию, заказчику нужно связать эти сведения с фактическим состоянием оборудования и условиями его эксплуатации.",
++    "title": "Обоснованная программа контроля",
++    "text": "Объединяем обязательные требования, риск-ориентированное планирование и фактические механизмы повреждения в выполнимой программе контроля. Учитываем производственные программы заказчика, условия эксплуатации трубопроводов и сосудов, историю обследований и ремонтов.",
+     "questions": [
+-      ["Где искать повреждения?", "Связать механизмы деградации с режимами эксплуатации, историей ремонтов и конструкцией объекта."],
+-      ["Как подготовить и выполнить контроль?", "Определить методы, точки контроля, доступы, квалификацию и технологию — до выезда на объект."],
+-      ["Как использовать результаты?", "Организовать данные так, чтобы они были пригодны для планирования ремонта и следующих инспекций."]
++      [
++        "Где искать повреждения?",
++        "Сопоставить механизмы повреждения с материалом, средой, режимами эксплуатации и историей объекта. Выбрать репрезентативные точки контроля."
++      ],
++      [
++        "Как определить объём контроля?",
++        "Согласовать применимые обязательные проверки, приоритеты риска, методы, точки, доступы и последовательность работ."
++      ],
++      [
++        "Как использовать результаты?",
++        "Организовать данные так, чтобы они были пригодны для планирования ремонта и следующих инспекций."
++      ]
+     ]
+   },
+   "process": [
+-    ["Исходные данные", "Состав оборудования, материалы, режимы эксплуатации и история обследований"],
+-    ["Инженерная подготовка", "Механизмы повреждения, коррозионные контуры, приоритеты и точки контроля"],
+-    ["Полевой контроль", "Измерения по согласованной технологии с привязкой к объекту"],
+-    ["Проверка результатов", "Проверенные записи, выявленные отклонения и ограничения обследования"],
+-    ["Следующий цикл", "Обновлённая история состояния и предложения по дальнейшим действиям"]
++    [
++      "Исходные данные",
++      "Производственные программы, состав трубопроводов и сосудов, материалы, режимы и история обследований"
++    ],
++    [
++      "Инженерная подготовка",
++      "Обязательные проверки, механизмы повреждения, коррозионные контуры и репрезентативные точки контроля"
++    ],
++    [
++      "Полевой контроль",
++      "Измерения по согласованной технологии с привязкой к объекту"
++    ],
++    [
++      "Проверка результатов",
++      "Проверенные записи, выявленные отклонения и ограничения обследования"
++    ],
++    [
++      "Следующий цикл",
++      "Обновлённая история состояния и предложения по дальнейшим действиям"
++    ]
+   ],
+   "services": [
+     {
+       "title": "Инженерная подготовка инспекций",
+       "methods": "Коррозионные контуры · Рабочие пакеты",
+-      "body": "Коррозионные контуры, уязвимые участки, точки мониторинга толщины, рабочие пакеты инспекции.",
++      "body": "Анализ производственных программ и механизмов повреждения, коррозионные контуры, выбор точек мониторинга, рабочие пакеты инспекции.",
+       "result": "Программа, в которой определены не только методы контроля, но и подготовка, доступы и последовательность работ."
+     },
+     {
+@@ -45,32 +69,59 @@
+       "result": "Прослеживаемые данные о сварных соединениях и обследованных зонах."
+     },
+     {
+-      "title": "Диагностика трубок теплообменников",
++      "title": "ВТД теплообменников",
+       "methods": "ECT · ECA · RFT · NFT/NFA · IRIS",
+-      "body": "Подбор методов под материал, геометрию и предполагаемые повреждения. Планируемая платформа — Ectane 3. Методы применяются в пределах выбранной комплектации и применимости.",
++      "body": "Внутритрубная диагностика: подбор методов под материал, геометрию и предполагаемые повреждения трубок. Планируемая платформа — Ectane 3. Применимость методов зависит от объекта и комплектации.",
+       "result": "Реестр обследованных трубок, карта результатов, ограничения и рекомендации для дальнейшей оценки."
+     },
+     {
+-      "title": "Инспекционные данные",
++      "title": "Инженерное сопровождение и данные",
+       "methods": "Проверка · Реестры · История измерений",
+-      "body": "Проверка отчётов, единая идентификация объектов, сопоставление обследований, подготовка структурированных реестров.",
+-      "result": "История состояния, пригодная для последующего анализа и систем заказчика."
++      "body": "Проверка отчётов и история измерений, обновление стратегий технического обслуживания, разработка процедур контроля верхнего уровня и формирование объёмов работ.",
++      "result": "Согласованные инженерные материалы и структурированные данные для планирования работ и систем заказчика."
+     }
+   ],
+   "tasks": [
+-    {"title": "Коррозионные контуры трубопроводов", "body": "Связь технологической схемы, условий эксплуатации, механизмов повреждения и мест контроля. Определение зон с различным характером и интенсивностью коррозии."},
+-    {"title": "Мониторинг коррозии корня сварного шва", "body": "Развиваемый подход с применением PAUT для сопоставления состояния выбранных соединений во времени.", "note": "Технология требует технической проверки и согласования с заказчиком."},
+-    {"title": "Подготовка остановочной кампании теплообменников", "body": "Согласование нумерации трубок, очистки, доступа, методов и формы итоговых данных до начала обследования."}
++    {
++      "title": "Коррозионные контуры трубопроводов",
++      "body": "Связь технологической схемы, условий эксплуатации, механизмов повреждения и мест контроля. Определение зон с различным характером и интенсивностью коррозии."
++    },
++    {
++      "title": "Мониторинг коррозии корня сварного шва",
++      "body": "По сведениям команды, имеется собственная технологическая процедура PAUT-мониторинга избирательной коррозии корня сварного шва. Она предназначена для сопоставления профиля повреждения во времени.",
++      "note": "Применимость процедуры и базовые значения проверяются для конкретной конфигурации объекта и согласуются с заказчиком."
++    },
++    {
++      "title": "Подготовка остановочной кампании теплообменников",
++      "body": "Согласование нумерации трубок, очистки, доступа, методов и формы итоговых данных до начала обследования."
++    }
+   ],
+   "team": [
+-    {"initials": "АБ", "name": "Бабынин А.В.", "role": "Директор", "detail": "Операционное управление, организация работ и безопасность"},
+-    {"initials": "ВГ", "name": "Голов В.В.", "role": "Развитие и методики", "detail": "Развитие, лаборатория, методики и метрология"},
+-    {"initials": "ВК", "name": "Кинзягулов В.А.", "role": "Техническая экспертиза", "detail": "Техническая экспертиза и проверка отчётов"}
++    {
++      "initials": "АБ",
++      "name": "Бабынин А.В.",
++      "role": "Директор",
++      "detail": "Операционное управление, организация работ и безопасность"
++    },
++    {
++      "initials": "ВГ",
++      "name": "Голов В.В.",
++      "role": "Развитие и методики",
++      "detail": "Развитие, лаборатория, методики и метрология"
++    },
++    {
++      "initials": "ВК",
++      "name": "Кинзягулов В.А.",
++      "role": "Техническая экспертиза",
++      "detail": "Техническая экспертиза и проверка отчётов"
++    }
+   ],
+   "quality": [
+     "Квалификация под метод и объект",
+     "Готовность приборов и метрологических документов",
+     "Проверка первичных данных и выводов",
+     "Фиксация ограничений до передачи отчёта"
+-  ]
++  ],
++  "additionalWork": "По отдельному заданию рассматриваем традиционные методы НК с канатным доступом, снятие теплоизоляции, обследования DROPS и API 4G. Состав, квалификация и готовность к этим работам проверяются отдельно.",
++  "epbSupport": "Готовим диагностическую часть программ экспертизы промышленной безопасности: уточняем методы, доступы и объём обследований, включая возможности уменьшить демонтаж. Самостоятельная ЭПБ не входит в стартовую деятельность; экспертные решения и заключения остаются у уполномоченной организации."
+ }
+--- before/content/investor.json
++++ after/content/investor.json
+@@ -1,41 +1,153 @@
+ {
+-  "sourceRevision": "12.09.2026",
+-  "sourcePdf": "ais-first-meeting-2026-09-12.pdf",
+-  "sourcePages": {"overview": 3, "economics": 11, "liquidity": 12, "rates": 13, "equity": 10},
+-  "years": [2026, 2027, 2028],
++  "sourceRevision": "DOCX-2026-09-13",
++  "years": [
++    2026,
++    2027,
++    2028
++  ],
+   "scenarios": {
+     "base": {
+       "label": "Основной вариант",
+       "tag": "2 команды PAUT · диагностика теплообменников",
+-      "revenue": [14.01, 92.68, 92.68],
+-      "result": [-0.03, 31.57, 30.23],
+-      "financingNeed": 37.65
++      "revenue": [
++        14.01,
++        92.68,
++        92.68
++      ],
++      "result": [
++        -0.03,
++        31.57,
++        30.23
++      ],
++      "financingNeed": 37.65,
++      "status": "Прежний расчёт · требует сверки",
++      "reviewNote": "37,65 млн ₽ относятся к прежней модели. Потребность и запас средств для бюджета оборудования 20 млн ₽ ещё не подтверждены."
+     },
+     "expanded": {
+       "label": "С шестью инженерами",
+       "tag": "Основной вариант + 6 инженеров · при обеспеченном заказе",
+-      "revenue": [18.88, 121.87, 121.87],
+-      "result": [1.34, 40.16, 38.22],
+-      "financingNeed": 47.50
++      "revenue": [
++        18.88,
++        121.87,
++        121.87
++      ],
++      "result": [
++        1.34,
++        40.16,
++        38.22
++      ],
++      "financingNeed": 47.5,
++      "status": "Прежний расчёт · требует сверки",
++      "reviewNote": "В таблицах источников — 47,50 млн ₽, в тексте — 52,50 млн ₽. Дефицит при запросе 47 млн ₽ не согласован."
+     }
+   },
+-  "funding": {"total": 42, "equity": 15, "loan": 27, "paut": 5, "ectane": 10, "workingCapital": 27, "paymentDelayDays": 70, "investorShare": 40},
++  "funding": {
++    "total": 47,
++    "equity": 20,
++    "loan": 27,
++    "paut": 10,
++    "ectane": 10,
++    "workingCapital": 27,
++    "paymentDelayDays": 70,
++    "investorShare": 40
++  },
+   "program": [
+-    {"title": "Наземный PAUT", "lines": ["Инспектор и ассистент", "Одна планируемая постоянно оплачиваемая позиция команды", "SIUI SyncScan 3 — план закупки"]},
+-    {"title": "PAUT с канатным доступом", "lines": ["Руководитель доступа IRATA 3", "Инспектор PAUT с IRATA 2", "Ассистент IRATA 1"]},
+-    {"title": "Внутритрубная диагностика", "lines": ["Одна команда", "Один планируемый комплект Ectane 3", "90 дней ежегодно с 2027 года"]}
++    {
++      "title": "Наземный PAUT",
++      "lines": [
++        "Инспектор и ассистент",
++        "Одна планируемая постоянно оплачиваемая позиция команды",
++        "SIUI SyncScan 3 — план закупки"
++      ]
++    },
++    {
++      "title": "PAUT с канатным доступом",
++      "lines": [
++        "Руководитель доступа IRATA 3",
++        "Инспектор PAUT с IRATA 2",
++        "Ассистент IRATA 1"
++      ]
++    },
++    {
++      "title": "Внутритрубная диагностика",
++      "lines": [
++        "Одна команда",
++        "Один планируемый комплект Ectane 3",
++        "90 дней ежегодно с 2027 года"
++      ]
++    }
+   ],
+   "projects": [
+-    ["Сахалин-1", "Первый приоритет выхода"],
+-    ["Сахалин-2", "Развитие подрядных отношений"],
+-    ["Ямал СПГ / Арктик СПГ", "Развитие проектных возможностей"],
+-    ["ТШО, Казахстан", "Развитие партнёрского канала"]
++    [
++      "Сахалин-1",
++      "Первый приоритет выхода через предполагаемый подрядный канал."
++    ],
++    [
++      "Сахалин-2",
++      "Предполагаемый канал — ТЕХИНКОМ."
++    ],
++    [
++      "Ямал СПГ / Арктик СПГ",
++      "Развитие проектных возможностей."
++    ],
++    [
++      "ТШО, NCOC, Павлодарский НПЗ",
++      "Казахстан. Предполагаемые каналы — HSE Services, West Control Service (WCS), ARISE."
++    ]
+   ],
+   "milestones": [
+-    ["Октябрь 2026", "Подготовка запуска", "Организация компании и лаборатории, подготовка специалистов, закупка стартового оборудования PAUT."],
+-    ["Ноябрь 2026", "Две программы PAUT", "Планируемое начало работ при готовности договоров, людей и оборудования."],
+-    ["Март 2027", "Диагностика теплообменников", "Планируемое начало основной кампании внутритрубной диагностики."],
+-    ["2027", "Стабилизация", "Повторяемая приёмка отчётов и управление платёжным циклом."],
+-    ["2027–2028", "Развитие под загрузку", "Инженерное сопровождение, новые проектные заказы и дополнительные кампании при обеспеченной ликвидности."]
+-  ]
++    [
++      "Октябрь 2026",
++      "Подготовка запуска",
++      "Организация компании и лаборатории, подготовка специалистов, закупка стартового оборудования PAUT."
++    ],
++    [
++      "Ноябрь 2026",
++      "Две программы PAUT",
++      "Планируемое начало работ при готовности договоров, людей и оборудования."
++    ],
++    [
++      "Март 2027",
++      "Диагностика теплообменников",
++      "Планируемое начало основной кампании внутритрубной диагностики."
++    ],
++    [
++      "2027",
++      "Стабилизация",
++      "Повторяемая приёмка отчётов и управление платёжным циклом."
++    ],
++    [
++      "2027–2028",
++      "Развитие под загрузку",
++      "Инженерное сопровождение, новые проектные заказы и дополнительные кампании при обеспеченной ликвидности."
++    ]
++  ],
++  "attachment": null,
++  "review": {
++    "status": "needs_model_review",
++    "title": "Требует сверки модели",
++    "summary": "Локальный финансовый черновик. Новые вводные документов не согласованы с расчётными таблицами. Для внешней инвесторской демонстрации эта редакция не утверждена.",
++    "issues": [
++      [
++        "Долевой вклад",
++        "20 млн ₽ указаны в документе 00 и резюме 01; в заключительном разделе 01 остались 15 млн ₽. Ниже показано новое предложение, требующее согласования."
++      ],
++      [
++        "Потребность с инженерами",
++        "Таблицы 01 и финансовой выжимки: 47,50 млн ₽; текст выжимки: 52,50 млн ₽. При запросе 47 млн ₽ это дефицит 0,50 или 5,50 млн ₽. Согласованного значения пока нет."
++      ],
++      [
++        "Основной вариант",
++        "37,65 млн ₽ с резервом перенесены из прежнего расчёта. Достаточность нового финансирования 47 млн ₽ после удорожания оборудования не подтверждена."
++      ],
++      [
++        "Прибыль и деньги",
++        "Амортизация, результат после УСН и денежные остатки не подтверждены для оборудования на 20 млн ₽. Пояснение выжимки всё ещё включает первоначальные 42 млн ₽."
++      ],
++      [
++        "Расчётная основа",
++        "В локальном Excel 04 сохранены прежние 42 млн ₽ финансирования, 15 млн ₽ вклада и 5 млн ₽ за два SIUI. Нужен согласованный пересчёт помесячной модели."
++      ]
++    ]
++  }
+ }
+--- before/.github/workflows/check.yml
++++ after/.github/workflows/check.yml
+@@ -15,6 +15,6 @@
+           node-version: '22'
+       - run: npm ci --ignore-scripts --no-audit --no-fund
+       - run: npm run verify
+-      - name: Validate upload script syntax
+-        run: bash -n scripts/push-private.sh
++      - name: Verify minimal source delivery without documents
++        run: npm run check:clean
+       # Deliberately do not upload the investor build as an Actions artifact.
+--- before/scripts/source-files.mjs
++++ after/scripts/source-files.mjs
+@@ -0,0 +1,11 @@
++// Explicit source list for clean-copy verification; no Git mutation or upload.
++export const sourceFiles = [
++  '.gitignore', '.gitattributes', '.nvmrc', 'README.md',
++  'package.json', 'package-lock.json',
++  '.github/workflows/check.yml', '.github/workflows/pages-public.yml',
++  'assets/ais-monogram.png', 'content/site.json', 'content/investor.json',
++  'src/app.js', 'src/styles.css',
++  'scripts/build.mjs', 'scripts/render.mjs', 'scripts/serve.mjs',
++  'scripts/source-files.mjs', 'scripts/check-clean.mjs',
++  'tests/site.test.mjs', 'tests/browser_check.py'
++];
+--- before/scripts/check-clean.mjs
++++ after/scripts/check-clean.mjs
+@@ -0,0 +1,25 @@
++import {mkdtemp,mkdir,copyFile,rm} from 'node:fs/promises';
++import {tmpdir} from 'node:os';
++import {join,dirname} from 'node:path';
++import {spawnSync} from 'node:child_process';
++import {fileURLToPath} from 'node:url';
++import {sourceFiles} from './source-files.mjs';
++const root=fileURLToPath(new URL('../',import.meta.url));
++const temp=await mkdtemp(join(tmpdir(),'ais-clean-'));
++try {
++  for(const file of sourceFiles){
++    await mkdir(dirname(join(temp,file)),{recursive:true});
++    await copyFile(join(root,file),join(temp,file));
++  }
++  for(const args of [['--test','tests/site.test.mjs'],['scripts/build.mjs','--all']]){
++    const result=spawnSync(process.execPath,args,{cwd:temp,stdio:'inherit'});
++    if(result.error) throw result.error;
++    if(result.status!==0) throw new Error('Проверка чистого набора исходников завершилась ошибкой.');
++  }
++  await rm(join(temp,'content/investor.json'));
++  const result=spawnSync(process.execPath,['scripts/build.mjs','--audience','public'],{cwd:temp,stdio:'inherit'});
++  if(result.error || result.status!==0) throw new Error('Публичная сборка зависит от инвесторского контента.');
++  console.log(`PASS: ${sourceFiles.length} source files; builds without documents; public builds without investor JSON.`);
++} finally {
++  await rm(temp,{recursive:true,force:true});
++}
